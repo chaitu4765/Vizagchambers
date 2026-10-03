@@ -45,7 +45,8 @@ export async function POST(request: Request) {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?) ON CONFLICT(id) DO NOTHING`).bind(id, kind, sourcePage, fullName, email, phone, company, JSON.stringify(details), hash, new Date().toISOString()),
       db.prepare("SELECT payload_hash FROM enquiries WHERE id = ?").bind(id),
     ]);
-    if (results[1].results[0]?.payload_hash !== hash) return reply({ error: "This request was already submitted with different details. Please start a new form." }, 409);
+    const saved = results[1].results[0] as { payload_hash: string } | undefined;
+    if (saved?.payload_hash !== hash) return reply({ error: "This request was already submitted with different details. Please start a new form." }, 409);
     return reply({ reference: `VCCI-${id.toUpperCase()}`, status: "pending" }, results[0].meta.changes ? 201 : 200);
   } catch (error) {
     console.error("Enquiry storage unavailable", error instanceof Error ? error.message : "Unknown database error");

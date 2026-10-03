@@ -36,11 +36,12 @@ export function EnquiryForm({ sourcePage }: { sourcePage: keyof typeof requestPa
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...JSON.parse(payload), id: requestId.current }),
       });
-      const result = await response.json();
+      const result = await response.json() as { error?: string; fields?: Record<string, string[]>; reference?: string };
       if (!response.ok) {
         setFields(result.fields ?? {});
         throw new Error(result.error || "We couldn’t save your request. Please try again.");
       }
+      if (!result.reference) throw new Error("The confirmation was incomplete. Please try again.");
       setReference(result.reference);
       requestAnimationFrame(() => feedback.current?.focus());
     } catch (error) {
