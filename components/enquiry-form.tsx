@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { membershipTypes, businessCategories, requestPages } from "@/lib/enquiries";
+import { membershipTypes, businessCategories, requestPages, todayInVizag } from "@/lib/enquiries";
 
 export function EnquiryForm({ sourcePage }: { sourcePage: keyof typeof requestPages }) {
   const kind = requestPages[sourcePage];
@@ -36,7 +36,7 @@ export function EnquiryForm({ sourcePage }: { sourcePage: keyof typeof requestPa
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...JSON.parse(payload), id: requestId.current }),
       });
-      const result = await response.json() as { error?: string; fields?: Record<string, string[]>; reference?: string };
+      const result = await response.json().catch(() => ({ error: "The connection was interrupted. Your details are still here — please try again." })) as { error?: string; fields?: Record<string, string[]>; reference?: string };
       if (!response.ok) {
         setFields(result.fields ?? {});
         throw new Error(result.error || "We couldn’t save your request. Please try again.");
@@ -52,7 +52,7 @@ export function EnquiryForm({ sourcePage }: { sourcePage: keyof typeof requestPa
     <label key={name}>
       {label}{required && " *"}
       <Input name={name} type={type} required={required} autoComplete={autoComplete} maxLength={type === "email" ? 254 : type === "tel" ? 25 : 160}
-        min={type === "number" ? 1 : type === "date" ? new Date().toISOString().slice(0,10) : undefined} max={type === "number" ? 10000 : undefined}
+        min={type === "number" ? 1 : type === "date" ? todayInVizag() : undefined} max={type === "number" ? 10000 : undefined}
         aria-invalid={!!fields[name]} aria-describedby={fields[name] ? `${name}-error` : undefined} />
       {fields[name] && <span className="field-error" id={`${name}-error`}>{fields[name][0]}</span>}
     </label>

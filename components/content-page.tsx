@@ -273,7 +273,7 @@ export default function ContentPage({
   const isDirectory = page.route === "/join/members_directory";
   const isLeadership = page.route === "/executive_committee";
   const useTabs = page.tabs.length > 0 && page.route !== "/join";
-  const formPage = page.route in requestPages;
+  const formPage = Object.hasOwn(requestPages, page.route);
   const tabBody = (t: ContentPageData["tabs"][number]) =>
     /directory/i.test(t.title) ? (
       <Directory members={members} />

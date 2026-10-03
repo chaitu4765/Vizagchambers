@@ -17,9 +17,10 @@ export const requestPages = {
 } as const;
 
 const shortText = z.string().trim().max(160);
+export const todayInVizag = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
 export const enquirySchema = z.object({
   id: z.string().uuid(),
-  sourcePage: z.string().refine((v) => v in requestPages, "Choose a valid enquiry page."),
+  sourcePage: z.string().refine((v) => Object.hasOwn(requestPages, v), "Choose a valid enquiry page."),
   fullName: shortText.min(2, "Enter your full name."),
   email: z.string().trim().email("Enter a valid email address.").max(254).transform(v => v.toLowerCase()),
   phone: z.string().trim().regex(/^[+\d()\s.-]{7,25}$/, "Enter a valid phone number.").refine(v => v.replace(/\D/g, "").length >= 7, "Enter a valid phone number."),
@@ -49,7 +50,7 @@ export const enquirySchema = z.object({
   if (kind === "booking") {
     if (!["VCCI Conference Hall", "Board Room"].includes(v.venue ?? "")) issue("venue", "Choose a meeting space.");
     const date = v.eventDate ?? "";
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(date)) || new Date(date).toISOString().slice(0,10) !== date || date < new Date().toISOString().slice(0,10)) issue("eventDate", "Choose today or a future date.");
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(date)) || new Date(date).toISOString().slice(0,10) !== date || date < todayInVizag()) issue("eventDate", "Choose today or a future date.");
     if (!["3 Hours", "4 Hours", "Full Day"].includes(v.duration ?? "")) issue("duration", "Choose a duration.");
     if (!/^\d+$/.test(v.capacity ?? "") || Number(v.capacity) < 1 || Number(v.capacity) > 10000) issue("capacity", "Enter the number of attendees.");
   }

@@ -32,7 +32,7 @@ export function SiteHeader() {
       <div className="header-utility">
         <span>THE VIZAGAPATAM CHAMBER OF COMMERCE & INDUSTRY</span>
         <div><a href="/about-us">About Us</a><a href="/contact-us">Contact Us</a>
-          {content.social.map((s, i) => <a key={s.href} href={s.href} target="_blank" rel="noreferrer" aria-label={["Facebook", "Instagram", "X (Twitter)"][i]}>{i === 0 ? "f" : i === 1 ? <Camera size={14} /> : "𝕏"}</a>)}
+          {content.social.slice(0, 3).map((s, i) => <a key={s.href} href={s.href} target="_blank" rel="noreferrer" aria-label={["Facebook", "Instagram", "X (Twitter)"][i]}>{i === 0 ? "f" : i === 1 ? <Camera size={14} /> : "𝕏"}</a>)}
         </div>
       </div>
       <header className="site-header">
