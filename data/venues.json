@@ -1,0 +1,77 @@
+{
+  "sourceUrl": "https://www.vizagchamber.com/conference_hall_booking",
+  "venues": [
+    {
+      "title": "VCCI Conference Hall",
+      "image": "https://www.vizagchamber.com/uploads/7548da1a6162bfbcd528cae1af909c91.JPG",
+      "address": "206,207, Dutt Island, Siripuram, Visakhapatnam",
+      "bookingHref": "#join-form",
+      "prices": [
+        {
+          "duration": "3 Hours",
+          "display": "₹0.00 + GST"
+        },
+        {
+          "duration": "4 Hours",
+          "display": "₹0.00 + GST"
+        },
+        {
+          "duration": "Full Day",
+          "display": "₹0.00 + GST"
+        }
+      ],
+      "sourceText": "Book Now VCCI Conference Hall 206,207, Dutt Island, Siripuram, Visakhapatnam 3 Hours: ₹0.00 + GST 4 Hours: ₹0.00 + GST Full Day: ₹0.00 + GST",
+      "hidden": false
+    },
+    {
+      "title": "Board Room",
+      "image": "https://www.vizagchamber.com/uploads/ee85422a5da9d5eb6104a2e17dd49860.png",
+      "address": "206,207 Dutt Island Siripuram, Visakhapatnam",
+      "bookingHref": "#join-form",
+      "prices": [
+        {
+          "duration": "3 Hours",
+          "display": "₹0.00 + GST"
+        },
+        {
+          "duration": "4 Hours",
+          "display": "₹0.00 + GST"
+        },
+        {
+          "duration": "Full Day",
+          "display": "₹0.00 + GST"
+        }
+      ],
+      "sourceText": "Book Now Board Room 206,207 Dutt Island Siripuram, Visakhapatnam 3 Hours: ₹0.00 + GST 4 Hours: ₹0.00 + GST Full Day: ₹0.00 + GST",
+      "hidden": false
+    },
+    {
+      "title": "Title Here",
+      "image": "https://www.vizagchamber.com/images/hall4.jpg",
+      "address": "Vizag",
+      "bookingHref": "#join-form",
+      "prices": [],
+      "sourceText": "Book Now Title Here Vizag 5000 Per Day Onwards",
+      "hidden": true
+    },
+    {
+      "title": "Title Here",
+      "image": "https://www.vizagchamber.com/images/hall5.jpg",
+      "address": "Vizag",
+      "bookingHref": "#join-form",
+      "prices": [],
+      "sourceText": "Book Now Title Here Vizag 5000 Per Day Onwards",
+      "hidden": true
+    },
+    {
+      "title": "Title Here",
+      "image": "https://www.vizagchamber.com/images/hall6.jpg",
+      "address": "Vizag",
+      "bookingHref": "#join-form",
+      "prices": [],
+      "sourceText": "Book Now Title Here Vizag 5000 Per Day Onwards",
+      "hidden": true
+    }
+  ],
+  "note": "Displayed source prices are ₹0.00 + GST because source data fields are blank. Confirm pricing with VCCI rather than interpreting these values as free rental. Hidden d-none cards are original template placeholders."
+}

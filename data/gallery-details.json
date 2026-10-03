@@ -1,0 +1,72 @@
+[
+  {
+    "title": "AGM 2020",
+    "href": "https://www.vizagchamber.com/gallery/gallery_view/agm-2020",
+    "route": "/gallery/gallery_view/agm-2020",
+    "image": "https://www.vizagchamber.com/uploads/4632f02c908ce72b43b58bf5e344981f.jpg",
+    "status": 200,
+    "filename": "gallery__gallery_view__agm-2020.html",
+    "images": [
+      "https://www.vizagchamber.com/uploads/4d8a0279ec10fa48ca722f3bfe350648.jpg",
+      "https://www.vizagchamber.com/uploads/61d45f7d8ea20f665b2fa10de87c2cc4.jpg",
+      "https://www.vizagchamber.com/uploads/192c0526c243b0f4e31e79d5210c3c92.jpg"
+    ],
+    "text": "",
+    "note": "Original published album photographs."
+  },
+  {
+    "title": "Odisha State Delegation",
+    "href": "https://www.vizagchamber.com/gallery/gallery_view/odisha-state-delegation",
+    "route": "/gallery/gallery_view/odisha-state-delegation",
+    "image": "https://www.vizagchamber.com/uploads/4bc7ffc41c13547dbbcc45a9662bc758.jpg",
+    "status": 200,
+    "filename": "gallery__gallery_view__odisha-state-delegation.html",
+    "images": [],
+    "text": "",
+    "note": "The source album page returns HTTP 200 but has no published photographs; album thumbnail remains available in image."
+  },
+  {
+    "title": "Workshop on CIBIL Score & Report",
+    "href": "https://www.vizagchamber.com/gallery/gallery_view/workshop-on-cibil-score--report",
+    "route": "/gallery/gallery_view/workshop-on-cibil-score--report",
+    "image": "https://www.vizagchamber.com/uploads/12e7f282c99da469ed0b3e388118b062.jpg",
+    "status": 200,
+    "filename": "gallery__gallery_view__workshop-on-cibil-score--report.html",
+    "images": [],
+    "text": "",
+    "note": "The source album page returns HTTP 200 but has no published photographs; album thumbnail remains available in image."
+  },
+  {
+    "title": "Trade & Industry Union Budget 2020",
+    "href": "https://www.vizagchamber.com/gallery/gallery_view/trade--industry-union-budget-2020",
+    "route": "/gallery/gallery_view/trade--industry-union-budget-2020",
+    "image": "https://www.vizagchamber.com/uploads/140fac4397a628205d3c6846fe708341.jpg",
+    "status": 200,
+    "filename": "gallery__gallery_view__trade--industry-union-budget-2020.html",
+    "images": [],
+    "text": "",
+    "note": "The source album page returns HTTP 200 but has no published photographs; album thumbnail remains available in image."
+  },
+  {
+    "title": "Stakeholders Meet",
+    "href": "https://www.vizagchamber.com/gallery/gallery_view/stakeholders-meet",
+    "route": "/gallery/gallery_view/stakeholders-meet",
+    "image": "https://www.vizagchamber.com/uploads/9fb152e4dd3fe66ebc2c833f8d07eccb.jpg",
+    "status": 200,
+    "filename": "gallery__gallery_view__stakeholders-meet.html",
+    "images": [],
+    "text": "",
+    "note": "The source album page returns HTTP 200 but has no published photographs; album thumbnail remains available in image."
+  },
+  {
+    "title": "GST New Returns",
+    "href": "https://www.vizagchamber.com/gallery/gallery_view/gst-new-returns",
+    "route": "/gallery/gallery_view/gst-new-returns",
+    "image": "https://www.vizagchamber.com/uploads/65a89d39baad24594070ce1330539e28.jpg",
+    "status": 200,
+    "filename": "gallery__gallery_view__gst-new-returns.html",
+    "images": [],
+    "text": "",
+    "note": "The source album page returns HTTP 200 but has no published photographs; album thumbnail remains available in image."
+  }
+]
