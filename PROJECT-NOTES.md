@@ -11,6 +11,8 @@ npm run dev
 
 The development preview is http://127.0.0.1:5173. Build with `npm run build`. The portable Cloudflare output is `dist/server/index.js` plus `dist/client`.
 
+For Vercel, use the native Next.js target in `vercel.json`: `npm run build:vercel` produces `.next`, and `npm run start:vercel` previews it locally. See `VERCEL.md` for deployment and membership database setup. The Cloudflare and Vercel deployments use separate storage adapters.
+
 ## Included
 
 - Complete homepage: three original hero photos, six chamber/service links, four promotional images, 14 executive profiles and biographies, all 13 news links, all 10 publications, membership and meeting photographs, six careers providers, social links and all footer navigation.

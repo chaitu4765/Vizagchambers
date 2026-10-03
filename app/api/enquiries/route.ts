@@ -1,4 +1,4 @@
-import { getD1 } from "@/db";
+import { saveEnquiry } from "@/db/enquiry-store";
 import { enquirySchema, requestPages } from "@/lib/enquiries";
 
 const headers = { "Cache-Control": "no-store" };
@@ -39,17 +39,11 @@ export async function POST(request: Request) {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(normalized));
   const hash = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
   try {
-    const db = getD1();
-    const results = await db.batch([
-      db.prepare(`INSERT INTO enquiries (id, kind, source_page, full_name, email, phone, company, details, payload_hash, status, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?) ON CONFLICT(id) DO NOTHING`).bind(id, kind, sourcePage, fullName, email, phone, company, JSON.stringify(details), hash, new Date().toISOString()),
-      db.prepare("SELECT payload_hash FROM enquiries WHERE id = ?").bind(id),
-    ]);
-    const saved = results[1].results[0] as { payload_hash: string } | undefined;
-    if (saved?.payload_hash !== hash) return reply({ error: "This request was already submitted with different details. Please start a new form." }, 409);
-    return reply({ reference: `VCCI-${id.toUpperCase()}`, status: "pending" }, results[0].meta.changes ? 201 : 200);
+    const saved = await saveEnquiry({ id, kind, sourcePage, fullName, email, phone, company, details: JSON.stringify(details), payloadHash: hash, createdAt: new Date().toISOString() });
+    if (saved.payloadHash !== hash) return reply({ error: "This request was already submitted with different details. Please start a new form." }, 409);
+    return reply({ reference: `VCCI-${id.toUpperCase()}`, status: "pending" }, saved.created ? 201 : 200);
   } catch (error) {
-    console.error("Enquiry storage unavailable", error instanceof Error ? error.message : "Unknown database error");
+    console.error("Enquiry storage unavailable", error instanceof Error ? error.name : "Unknown database error");
     return reply({ error: "We couldn’t save your request right now. Your details are still here — please try again." }, 503);
   }
 }
