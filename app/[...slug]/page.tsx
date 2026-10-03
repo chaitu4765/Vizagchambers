@@ -4,8 +4,10 @@ import ContentPage, { type ContentPageData } from "@/components/content-page";
 import pages from "@/data/pages.json";
 import directories from "@/data/directories.json";
 import galleries from "@/data/gallery-details.json";
+import details from "@/data/detail-pages.json";
+const allPages = [...pages, ...details.filter(d => !pages.some(p => p.route === d.route))];
 export function generateStaticParams() {
-  return [...pages.map((p) => p.route), ...galleries.map((g) => g.route)].map(
+  return [...allPages.map((p) => p.route), ...galleries.map((g) => g.route)].map(
     (route) => ({ slug: route.split("/").filter(Boolean) }),
   );
 }
@@ -16,7 +18,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const route = "/" + (await params).slug.join("/");
   const page =
-    pages.find((p) => p.route === route) ||
+    allPages.find((p) => p.route === route) ||
     galleries.find((g) => g.route === route);
   return {
     title: `${page?.title || "Page"} | Vizag Chamber`,
@@ -30,7 +32,7 @@ export default async function Page({
 }) {
   const route = "/" + (await params).slug.join("/");
   const gallery = galleries.find((g) => g.route === route);
-  const page = pages.find((p) => p.route === route);
+  const page = allPages.find((p) => p.route === route);
   if (!page && !gallery) notFound();
   const directory = directories[route as keyof typeof directories];
   const data: ContentPageData = page
@@ -50,6 +52,9 @@ export default async function Page({
         })),
         eventCards: page.eventCards,
         forms: page.forms.map((f) => ({ action: f.action })),
+        detailImages: "detailImages" in page ? page.detailImages : undefined,
+        detailDate: "detailDate" in page ? page.detailDate : undefined,
+        backHref: "backHref" in page ? page.backHref : undefined,
       }
     : {
         route,

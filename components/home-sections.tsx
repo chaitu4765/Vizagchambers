@@ -107,7 +107,7 @@ export function Leadership({ full = false }: { full?: boolean }) {
   );
 }
 export function HomeSections() {
-  const [promo, setPromo] = useState(0);
+  const [promo, setPromo] = useState(1);
   const [allNews, setAllNews] = useState(false);
   const pubs = useRef<HTMLDivElement>(null);
   const news = allNews ? content.news : content.news.slice(0, 5);
@@ -291,7 +291,7 @@ export function HomeSections() {
           {content.publications.map((p) => (
             <a
               className="publication-card"
-              href={p.href}
+              href={localLink(p.href)}
               key={p.href}
               target="_blank"
               rel="noreferrer"

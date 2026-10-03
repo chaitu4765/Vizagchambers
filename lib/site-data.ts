@@ -1,14 +1,17 @@
 import content from "@/data/content.json";
-import routeList from "@/data/routes.json";
+import documents from "@/data/document-links.json";
 export { content };
 export const source = "https://www.vizagchamber.com";
-const routes = new Set(routeList);
 export const localLink = (href: string) => {
-  if (href === source || href === `${source}/`) return "/";
-  if (href.startsWith(source)) {
-    const u = new URL(href);
-    if (routes.has(u.pathname)) return u.pathname + u.search + u.hash;
-  }
-  return href;
+  if (/^https?:\/\/vccieco\.fdpconnect\.com/i.test(href)) return "/join#request";
+  if (!/^https?:\/\/(www\.)?vizagchamber\.com(?:\/|$)/i.test(href) && !href.startsWith("/uploads/")) return href;
+  const u = new URL(href, source);
+  const path = decodeURIComponent(u.pathname);
+  const document = (documents as Record<string, string>)[path];
+  if (document) return document;
+  if (["/-", "/MEMBER 2"].includes(path)) return "/member_of_week/advertise#request";
+  if (path.startsWith("/uploads/")) return "/gallery";
+  return u.pathname + u.search + u.hash;
 };
+export const localizeHtml = (html: string) => html.replace(/href="([^"]*)"/g, (_, href: string) => `href="${localLink(href)}"`);
 export const asset = (src: string) => `/assets/${src.split("/").pop()}`;

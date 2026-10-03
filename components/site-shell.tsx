@@ -17,39 +17,11 @@ import {
 } from "@/components/ui/navigation-menu";
 import { content, asset, localLink } from "@/lib/site-data";
 
-const groups = [
-  {
-    label: "The Chamber",
-    items: [
-      { label: "About Us", href: "/about-us" },
-      ...content.wings
-        .filter((w) => !["eCOO", "Helpline"].includes(w.name))
-        .map((w) => ({ label: w.name, href: localLink(w.href) })),
-      { label: "Executive Committee", href: "/executive_committee" },
-    ],
-  },
-  ...content.navigation
-    .filter((g) => ["Membership", "Services", "Events"].includes(g.label))
-    .map((g) => ({
-      ...g,
-      items: g.items.map((i) => ({ ...i, href: localLink(i.href) })),
-    })),
-  {
-    label: "Explore",
-    items: [
-      { label: "Business News", href: "/#insights" },
-      { label: "Publications", href: "/#publications" },
-      { label: "Media", href: "/media" },
-      { label: "Gallery", href: "/gallery" },
-      { label: "CSR", href: "/join/csr" },
-      { label: "CSR Events", href: "/csr_events" },
-      { label: "CSR Expenditure", href: "/csr_events/expenditure" },
-      { label: "City Network", href: "/city_network" },
-      { label: "AGM Notice", href: "/agm_notice" },
-      { label: "Contact Us", href: "/contact-us" },
-    ],
-  },
-];
+const groups = content.navigation.filter(g => g.label !== "Join").map(g => ({
+  ...g,
+  href: localLink(g.href),
+  items: g.items.map(i => ({ ...i, href: localLink(i.href) })),
+}));
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   return (
@@ -57,6 +29,12 @@ export function SiteHeader() {
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
+      <div className="header-utility">
+        <span>THE VIZAGAPATAM CHAMBER OF COMMERCE & INDUSTRY</span>
+        <div><a href="/about-us">About Us</a><a href="/contact-us">Contact Us</a>
+          {content.social.map((s, i) => <a key={s.href} href={s.href} target="_blank" rel="noreferrer" aria-label={["Facebook", "Instagram", "X (Twitter)"][i]}>{i === 0 ? "f" : i === 1 ? <Camera size={14} /> : "𝕏"}</a>)}
+        </div>
+      </div>
       <header className="site-header">
         <a className="brand" href="/" aria-label="Vizag Chamber home">
           <img
@@ -77,6 +55,7 @@ export function SiteHeader() {
           <NavigationMenuList>
             {groups.map((g) => (
               <NavigationMenuItem key={g.label}>
+                {g.items.length ? <>
                 <NavigationMenuTrigger className="nav-trigger">
                   {g.label}
                 </NavigationMenuTrigger>
@@ -87,6 +66,7 @@ export function SiteHeader() {
                     </NavigationMenuLink>
                   ))}
                 </NavigationMenuContent>
+                </> : <NavigationMenuLink asChild><a className="nav-direct" href={g.href}>{g.label}</a></NavigationMenuLink>}
               </NavigationMenuItem>
             ))}
           </NavigationMenuList>
@@ -105,6 +85,7 @@ export function SiteHeader() {
             <div className="menu-groups">
               {groups.map((g) => (
                 <div key={g.label}>
+                  {g.items.length ? <>
                   <h3>{g.label}</h3>
                   {g.items.map((i) => (
                     <a
@@ -115,10 +96,14 @@ export function SiteHeader() {
                       {i.label}
                     </a>
                   ))}
+                  </> : <a href={g.href} onClick={() => setOpen(false)}>{g.label}</a>}
                 </div>
               ))}
               <div>
-                <h3>Quick links</h3>
+                <h3>The Chamber</h3>
+                <a href="/join" onClick={() => setOpen(false)}>Become a member</a>
+                <a href="/about-us" onClick={() => setOpen(false)}>About Us</a>
+                <a href="/contact-us" onClick={() => setOpen(false)}>Contact Us</a>
                 {content.footerGroups[0].links.map((l) => (
                   <a key={l.href} href={localLink(l.href)}>
                     {l.label}
