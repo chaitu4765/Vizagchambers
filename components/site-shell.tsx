@@ -22,7 +22,7 @@ const groups = content.navigation.filter(g => g.label !== "Join").map(g => ({
   href: localLink(g.href),
   items: g.items.map(i => ({ ...i, href: localLink(i.href) })),
 }));
-export function SiteHeader() {
+export function SiteHeader({ animated = false }: { animated?: boolean }) {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -35,7 +35,7 @@ export function SiteHeader() {
           {content.social.slice(0, 3).map((s, i) => <a key={s.href} href={s.href} target="_blank" rel="noreferrer" aria-label={["Facebook", "Instagram", "X (Twitter)"][i]}>{i === 0 ? "f" : i === 1 ? <Camera size={14} /> : "𝕏"}</a>)}
         </div>
       </div>
-      <header className="site-header">
+      <header className={`site-header${animated ? " agency-header" : ""}`}>
         <a className="brand" href="/" aria-label="Vizag Chamber home">
           <img
             src={asset(content.logo)}

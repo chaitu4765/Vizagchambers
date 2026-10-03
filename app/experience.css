@@ -1474,3 +1474,79 @@
   max-width: 1200px;
   margin: auto;
 }
+
+/* Photo-backed adaptation of the supplied Hero 01 structure. */
+.agency-header {
+  position: sticky;
+  top: 14px;
+  width: calc(100% - 48px);
+  height: 84px;
+  margin: 16px auto -100px;
+  padding-inline: 24px;
+  border: 1px solid #ffffffb3;
+  border-radius: 24px;
+  background: #fafaf5f5;
+  box-shadow: 0 8px 32px #14221918;
+  animation: agency-nav-enter .85s cubic-bezier(.16,1,.3,1) both;
+}
+.agency-header .brand img { width: 54px; height: 56px; }
+.agency-header .header-join { border-radius: 100px; }
+.agency-header .nav-trigger, .agency-header .nav-direct { border-radius: 100px; transition: background .25s, color .25s, translate .25s; }
+.agency-header .nav-trigger:hover, .agency-header .nav-direct:hover,
+.agency-header .nav-trigger[data-state=open] { background: #e9dfc9; translate: 0 -2px; }
+.agency-header .nav-panel { border-radius: 18px; box-shadow: 0 16px 36px #14221926; }
+.agency-header .nav-panel a { border-radius: 10px; transition: background .2s, translate .2s; }
+.agency-header .nav-panel a:hover { translate: 4px 0; }
+.agency-hero { height: calc(100svh - 34px); min-height: 780px; }
+.agency-hero .hero-coordinate { top: 126px; color: white; text-shadow: 0 1px 7px #000; }
+.agency-hero .hero-content { top: 27%; left: 7%; right: 5%; }
+.agency-hero .hero-content h1 { animation: none; font-size: clamp(58px, 6.7vw, 112px); text-shadow: 0 3px 25px #0009; }
+.agency-hero .hero-line { display: block; overflow: hidden; padding-bottom: .12em; margin-bottom: -.12em; }
+.agency-hero .hero-line > span { display: block; animation: agency-line-enter 1.2s cubic-bezier(.16,1,.3,1) both; animation-delay: .2s; }
+.agency-hero .hero-line:nth-child(2) > span { animation-delay: .36s; }
+.agency-hero .eyebrow { display: inline-flex; padding: 10px 16px; border-radius: 100px; background: #fafaf5ed; color: #193128; border: 1px solid #fff9; font-size: 10px; }
+.agency-hero .hero-description { display: table; max-width: 570px; color: white; padding: 12px 18px; border-radius: 14px; background: #171b188c; }
+.agency-hero .hero-actions { animation-delay: .55s; }
+.agency-hero .hero-actions .button { border-radius: 100px; padding-inline: 30px; }
+.agency-hero .hero-actions .text-link { border-radius: 100px; padding: 16px 22px; background: #fafaf5f2; color: #183026; }
+.agency-hero .hero-actions .text-link span { transition: transform .3s; }
+.agency-hero .hero-actions .text-link:hover span { transform: translate(3px,-3px); }
+.agency-hero .hero-bottom { padding: 16px 20px; bottom: 24px; border: 1px solid #ffffff70; border-radius: 22px; background: #151a1780; backdrop-filter: blur(8px); animation: agency-nav-enter 1s .65s both; }
+.agency-hero .hero-caption { margin-right: 3%; }
+.agency-hero .hero-caption p { color: white; }
+.hero-thumbnails { display: flex; gap: 7px; margin-right: 16px; }
+.agency-hero .hero-thumbnails button { width: 52px; height: 42px; border-radius: 9px; overflow: hidden; border: 2px solid transparent; opacity: .7; transition: opacity .25s, transform .25s, border-color .25s; }
+.hero-thumbnails img { width: 100%; height: 100%; object-fit: cover; }
+.agency-hero .hero-thumbnails button[aria-pressed=true] { border-color: var(--gold); opacity: 1; transform: translateY(-4px); }
+.agency-hero .hero-thumbnails button:hover { opacity: 1; transform: translateY(-4px); }
+@keyframes agency-nav-enter { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes agency-line-enter { from { opacity: 0; transform: translateY(110%) rotate(2deg); } to { opacity: 1; transform: translateY(0) rotate(0); } }
+@media (max-width: 1100px) {
+  .agency-header { padding-inline: 18px; gap: 12px; }
+  .agency-hero .hero-caption { display: none; }
+}
+@media (max-width: 700px) {
+  .agency-header { width: calc(100% - 24px); top: 8px; height: 74px; margin: 12px auto -86px; border-radius: 20px; }
+  .agency-header .brand > span { font-size: 12px; }
+  .agency-header .brand small { font-size: 7px; }
+  .agency-header .brand img { width: 43px; height: 46px; }
+  .agency-hero { min-height: 780px; height: calc(100svh - 34px); }
+  .agency-hero .hero-coordinate { top: 108px; font-size: 9px; }
+  .agency-hero .hero-content { top: 24%; left: 6%; right: 6%; }
+  .agency-hero .hero-content h1 { font-size: clamp(43px, 10vw, 64px); }
+  .agency-hero .hero-line:nth-child(2) > span { max-width: 9em; }
+  .agency-hero .eyebrow { font-size: 8px; letter-spacing: .09em; padding: 9px 11px; }
+  .agency-hero .hero-description { font-size: 14px; }
+  .agency-hero .hero-actions { flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+  .agency-hero .hero-actions .button, .agency-hero .hero-actions .text-link { min-height: 46px; padding: 12px 20px; font-size: 12px; }
+  .agency-hero .hero-bottom { left: 5%; right: 5%; bottom: 18px; padding: 12px; justify-content: center; }
+  .agency-hero .scroll-hint { display: none; }
+  .hero-thumbnails { margin-right: 4px; gap: 5px; }
+  .agency-hero .hero-thumbnails button { width: 40px; height: 34px; }
+  .agency-hero .slide-controls { gap: 6px; }
+  .agency-hero .slide-controls > span { margin-right: 2px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .agency-header, .agency-hero .hero-line > span, .agency-hero .hero-bottom { animation: none; }
+  .agency-hero .hero-images { transform: none; }
+}

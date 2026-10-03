@@ -51,11 +51,13 @@
   box-sizing: border-box;
 }
 html {
+  overflow-x: clip;
   scroll-behavior: smooth;
   scroll-padding-top: 100px;
 }
 body {
   margin: 0;
+  overflow-x: clip;
   background: var(--paper);
   color: var(--navy);
   font-family: "DM Sans", sans-serif;
