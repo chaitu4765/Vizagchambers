@@ -19,7 +19,6 @@ export const requestPages = {
 const shortText = z.string().trim().max(160);
 export const todayInVizag = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
 export const enquirySchema = z.object({
-  id: z.string().uuid(),
   sourcePage: z.string().refine((v) => Object.hasOwn(requestPages, v), "Choose a valid enquiry page."),
   fullName: shortText.min(2, "Enter your full name."),
   email: z.string().trim().email("Enter a valid email address.").max(254).transform(v => v.toLowerCase()),

@@ -11,7 +11,7 @@ npm run dev
 
 The development preview is http://127.0.0.1:5173. Build with `npm run build`. The portable Cloudflare output is `dist/server/index.js` plus `dist/client`.
 
-For Vercel, use the native Next.js target in `vercel.json`: `npm run build:vercel` produces `.next`, and `npm run start:vercel` previews it locally. See `VERCEL.md` for deployment and membership database setup. The Cloudflare and Vercel deployments use separate storage adapters.
+For Vercel, use the native Next.js target in `vercel.json`: `npm run build:vercel` produces `.next`, and `npm run start:vercel` previews it locally. See `VERCEL.md` for deployment. No database setup is required.
 
 ## Included
 
@@ -22,7 +22,7 @@ For Vercel, use the native Next.js target in `vercel.json`: `npm run build:verce
 - All original event listings remain accessible through the event and wing archives, with 174 local event detail pages and their source photographs. Fourteen City Network detail pages retain their original information and tables.
 - Sixteen original documents are hosted under `public/documents`. Chamber navigation stays within the redesigned site; independent news, careers, social and member websites retain their external destinations.
 - Both requested advertising images are shown first in the homepage highlights carousel; the other two original promotions remain on the other slide.
-- Membership and other enquiries are saved to the site's D1 `enquiries` table with a pending status and a reference. There is no payment processing, automatic membership approval or email delivery. Owners can inspect saved requests through the Sites database tools.
+- Membership and other enquiries prepare an email draft in the browser. Visitors review and send the draft from their email app. No requests are stored, sent automatically, or marked as received.
 - Scroll-reactive hero, cinematic text entrances, reveal transitions, pointer-following highlights, cursor ring, image hover transitions, manually controlled carousels, gallery lightbox and keyboard-accessible dialogs/navigation.
 - Responsive layouts, reduced-motion support, skip link and labelled controls.
 - Decorative lines before text have been removed throughout, as requested.
@@ -49,8 +49,8 @@ For Vercel, use the native Next.js target in `vercel.json`: `npm run build:verce
 
 Content capture and audit notes are in the adjacent `research` directory. This redesign does not change the original website or its data.
 
-## Membership storage and verification
+## Enquiry forms and verification
 
-The logical D1 binding is `DB`; `drizzle/0000_next_purifiers.sql` creates the submissions table. Apply it once to a local preview as described by the starter. Production migrations are applied by Sites at publication. No public endpoint lists applicant details. The POST endpoint validates inputs, bounds request size and rejects cross-origin requests. Retrying the same submission ID is idempotent.
+Forms validate required fields and consent locally, then show a copyable email draft and a mailto link. No database bindings, migrations, storage endpoint, or database credentials are required. Existing deployed records are not deleted by this source change.
 
-`node scripts/verify-enquiries.mjs` checks validation, consent, same-origin enforcement, size limits, successful storage, duplicate retries, conflicting retries and the absence of a public GET endpoint against localhost only. `node scripts/verify-routes.mjs` checks every captured page and rejects links to the old Chamber website.
+`node scripts/verify-routes.mjs` checks every captured page and rejects links to the old Chamber website.

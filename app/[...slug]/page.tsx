@@ -7,7 +7,12 @@ import galleries from "@/data/gallery-details.json";
 import details from "@/data/detail-pages.json";
 const allPages = [...pages, ...details.filter(d => !pages.some(p => p.route === d.route))];
 export function generateStaticParams() {
-  return [...allPages.map((p) => p.route), ...galleries.map((g) => g.route)].map(
+  return [...allPages.map((p) => p.route), ...galleries.map((g) => g.route)]
+    // Vercel appends prerender metadata suffixes to each filename. Keep long
+    // original URLs available through dynamic fallback instead of exceeding
+    // Linux's 255-byte filename limit during deployment packaging.
+    .filter((route) => process.env.VERCEL !== "1" || route.split("/").every((segment) => Buffer.byteLength(segment) <= 200))
+    .map(
     (route) => ({ slug: route.split("/").filter(Boolean) }),
   );
 }

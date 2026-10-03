@@ -1,52 +1,38 @@
 "use client";
 import { useRef, useState, type FormEvent } from "react";
-import { ArrowUpRight, CheckCircle2, LoaderCircle } from "lucide-react";
+import { ArrowUpRight, CheckCircle2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { membershipTypes, businessCategories, requestPages, todayInVizag } from "@/lib/enquiries";
+import { enquirySchema, membershipTypes, businessCategories, requestPages, todayInVizag } from "@/lib/enquiries";
 
 export function EnquiryForm({ sourcePage }: { sourcePage: keyof typeof requestPages }) {
   const kind = requestPages[sourcePage];
   const membership = kind === "membership";
   const booking = kind === "booking";
-  const [busy, setBusy] = useState(false);
   const [consent, setConsent] = useState(false);
   const [error, setError] = useState("");
   const [fields, setFields] = useState<Record<string, string[]>>({});
-  const [reference, setReference] = useState("");
-  const requestId = useRef<string | null>(null);
-  const pendingPayload = useRef("");
+  const [emailDraft, setEmailDraft] = useState("");
   const feedback = useRef<HTMLDivElement>(null);
   const title = membership ? "Become a member" : booking ? "Request a meeting space" : kind === "renewal" ? "Renew your membership" : kind === "advertising" ? "Advertise with us" : "How can we help?";
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
+  function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (busy) return;
     setError(""); setFields({});
     if (!consent) { setError("Please agree to be contacted about your request."); return; }
     const values = Object.fromEntries(new FormData(event.currentTarget));
-    const payload = JSON.stringify({ ...values, sourcePage, consent });
-    if (!requestId.current || pendingPayload.current !== payload) requestId.current = crypto.randomUUID();
-    pendingPayload.current = payload;
-    setBusy(true);
-    try {
-      const response = await fetch("/api/enquiries", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...JSON.parse(payload), id: requestId.current }),
-      });
-      const result = await response.json().catch(() => ({ error: "The connection was interrupted. Your details are still here — please try again." })) as { error?: string; fields?: Record<string, string[]>; reference?: string };
-      if (!response.ok) {
-        setFields(result.fields ?? {});
-        throw new Error(result.error || "We couldn’t save your request. Please try again.");
-      }
-      if (!result.reference) throw new Error("The confirmation was incomplete. Please try again.");
-      setReference(result.reference);
-      requestAnimationFrame(() => feedback.current?.focus());
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "The connection was interrupted. Your details are still here — please try again.");
-    } finally { setBusy(false); }
+    const parsed = enquirySchema.safeParse({ ...values, sourcePage, consent });
+    if (!parsed.success) {
+      setFields(parsed.error.flatten().fieldErrors);
+      setError("Please check the highlighted fields.");
+      return;
+    }
+    const labels: Record<string, string> = { fullName: "Full name", email: "Email", phone: "Phone", company: "Organisation", membershipType: "Membership type", businessCategory: "Business category", contactPerson: "Person in charge", address: "Address", memberId: "Membership number", venue: "Meeting space", eventDate: "Preferred date", duration: "Duration", capacity: "Attendees", message: "Message" };
+    const body = Object.entries(parsed.data).filter(([key, value]) => labels[key] && value).map(([key, value]) => `${labels[key]}: ${value}`).join("\n\n");
+    setEmailDraft(`${title}\n\n${body}\n\nEnquiry page: ${sourcePage}`);
+    requestAnimationFrame(() => feedback.current?.focus());
   }
   const field = (name: string, label: string, type = "text", required = true, autoComplete?: string) => (
     <label key={name}>
@@ -73,20 +59,21 @@ export function EnquiryForm({ sourcePage }: { sourcePage: keyof typeof requestPa
         <h2 id="request-title">{title}<span>.</span></h2>
         <p>{membership ? "Build new connections, find business opportunities and be part of Vizag’s growing community. Tell us about you and your organisation." : booking ? "Tell us about your meeting. Availability, pricing and your reservation will be confirmed separately." : "Share your details and your request using the form below."}</p>
         {membership && <a href="/join/benefits" className="underlined-link">Explore membership benefits <ArrowUpRight size={16} /></a>}
-        <p className="form-note">* Required fields. Your request is saved securely on this website.</p>
+        <p className="form-note">* Required fields. This form prepares an email for you to send to the Chamber. Your details are not saved on this website.</p>
       </div>
-      {reference ? (
+      <div>
+      {emailDraft && (
         <div className="enquiry-success" role="status" tabIndex={-1} ref={feedback}>
           <CheckCircle2 size={44} />
-          <h3>{membership ? "Application received" : "Request received"}</h3>
-          <p>Your {membership ? "application" : "request"} has been saved for review. Keep this reference for your records.</p>
-          <strong className="request-reference">{reference}</strong>
-          <p>{membership ? "Membership confirmation and any applicable fees are handled separately." : booking ? "This is an enquiry. Your venue is not reserved until availability is confirmed." : "Your request is pending review."}</p>
-          <a href="/" className="button button-gold">Back to the Chamber</a>
+          <h3>Your email draft is ready</h3>
+          <p>Nothing has been sent yet. Open your email app, review the details and send your enquiry to vizagchamber@gmail.com.</p>
+          <a href={`mailto:vizagchamber@gmail.com?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(emailDraft)}`} className="button button-gold">Open email app <ArrowUpRight size={18} /></a>
+          <label>Or copy this draft into your email<Textarea aria-label="Email draft" value={emailDraft} readOnly rows={10} /></label>
+          <p>{membership ? "Membership confirmation and any applicable fees are handled separately." : booking ? "Your venue is not reserved until availability is confirmed." : "The Chamber will respond by email."}</p>
         </div>
-      ) : (
-        <form className="enquiry-form" onSubmit={submit} aria-busy={busy}>
-          <fieldset className="form-grid" disabled={busy}>
+      )}
+        <form className="enquiry-form" onSubmit={submit} onChange={() => setEmailDraft("")}>
+          <fieldset className="form-grid">
             <legend className="sr-only">{title}</legend>
             {membership && <>{select("membershipType", "Membership type", membershipTypes)}{select("businessCategory", "Business category", businessCategories)}</>}
             {field("company", "Company / organisation", "text", membership, "organization")}
@@ -108,12 +95,12 @@ export function EnquiryForm({ sourcePage }: { sourcePage: keyof typeof requestPa
               <label htmlFor="request-consent">I agree to be contacted about this request and have read the <a href="/privacy-policy" target="_blank" rel="noreferrer">privacy policy</a>.</label>
             </div>
             {error && <p className="form-error wide" role="alert">{error}</p>}
-            <button type="submit" className="button button-gold wide" disabled={busy}>
-              {busy ? <><LoaderCircle className="form-spinner" size={18} /> Saving your request…</> : <>{membership ? "Submit membership application" : "Submit request"}<ArrowUpRight size={18} /></>}
+            <button type="submit" className="button button-gold wide">
+              Prepare email enquiry<ArrowUpRight size={18} />
             </button>
           </fieldset>
         </form>
-      )}
+      </div>
     </section>
   );
 }
