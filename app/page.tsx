@@ -58,7 +58,6 @@ export default function Home() {
               />
             ))}
           </div>
-          <div className="hero-shade" />
           <div className="hero-coordinate">
             <span>VISAKHAPATNAM, INDIA</span>
             <span>17.6868° N &nbsp; 83.2185° E</span>

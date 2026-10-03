@@ -207,23 +207,10 @@ img {
     opacity 1.3s,
     transform 8s;
   transform: scale(1.04);
-  filter: saturate(0.65);
 }
 .hero-images img.active {
   opacity: 1;
   transform: scale(1);
-}
-.hero-shade {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(
-      90deg,
-      rgba(4, 24, 35, 0.91),
-      rgba(4, 24, 35, 0.57) 65%,
-      rgba(4, 24, 35, 0.3)
-    ),
-    linear-gradient(0deg, rgba(3, 24, 35, 0.9), transparent 42%);
 }
 .hero-coordinate {
   position: absolute;
