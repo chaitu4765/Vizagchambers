@@ -2,7 +2,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "../vendor/shadcn-tailwind-4.13.0.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
+  color-scheme: light;
   --background: #fafaf7;
   --foreground: #102b36;
   --card: #fff;
@@ -51,11 +55,13 @@
   box-sizing: border-box;
 }
 html {
+  color-scheme: light;
   overflow-x: clip;
   scroll-behavior: smooth;
   scroll-padding-top: 100px;
 }
 body {
+  color-scheme: light;
   margin: 0;
   overflow-x: clip;
   background: var(--paper);

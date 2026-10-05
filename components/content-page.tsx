@@ -14,6 +14,7 @@ import { Leadership } from "@/components/home-sections";
 import { localLink, localizeHtml } from "@/lib/site-data";
 import { EnquiryForm } from "@/components/enquiry-form";
 import { requestPages } from "@/lib/enquiries";
+import { AboutUsView } from "@/components/about-us-view";
 type Event = { title: string; date?: string; image: string; href: string };
 type Member = {
   id: string;
@@ -272,6 +273,7 @@ export default function ContentPage({
 }) {
   const isDirectory = page.route === "/join/members_directory";
   const isLeadership = page.route === "/executive_committee";
+  const isAboutUs = page.route === "/about-us";
   const useTabs = page.tabs.length > 0 && page.route !== "/join";
   const formPage = Object.hasOwn(requestPages, page.route);
   const tabBody = (t: ContentPageData["tabs"][number]) =>
@@ -319,6 +321,8 @@ export default function ContentPage({
             <Directory members={members} />
           ) : isLeadership ? (
             <Leadership full />
+          ) : isAboutUs ? (
+            <AboutUsView />
           ) : page.status !== 200 ? (
             <div className="empty-state">
               <h2>Upcoming Events</h2>

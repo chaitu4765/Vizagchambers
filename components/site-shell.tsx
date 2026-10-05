@@ -1,125 +1,14 @@
 "use client";
-import { useState } from "react";
-import { Menu, Camera, Mail, Phone, MapPin, ChevronUp } from "lucide-react";
-import {
-  Sheet,
-  SheetContent,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import {
-  NavigationMenu,
-  NavigationMenuList,
-  NavigationMenuItem,
-  NavigationMenuTrigger,
-  NavigationMenuContent,
-  NavigationMenuLink,
-} from "@/components/ui/navigation-menu";
+import { Camera, Mail, Phone, MapPin, ChevronUp } from "lucide-react";
 import { content, asset, localLink } from "@/lib/site-data";
+import Header from "@/components/ui/hero-01-utils/header";
 
-const groups = content.navigation.filter(g => g.label !== "Join").map(g => ({
-  ...g,
-  href: localLink(g.href),
-  items: g.items.map(i => ({ ...i, href: localLink(i.href) })),
-}));
 export function SiteHeader({ animated = false }: { animated?: boolean }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <a href="#main-content" className="skip-link">
-        Skip to content
-      </a>
-      <div className="header-utility">
-        <span>THE VIZAGAPATAM CHAMBER OF COMMERCE & INDUSTRY</span>
-        <div><a href="/about-us">About Us</a><a href="/contact-us">Contact Us</a>
-          {content.social.slice(0, 3).map((s, i) => <a key={s.href} href={s.href} target="_blank" rel="noreferrer" aria-label={["Facebook", "Instagram", "X (Twitter)"][i]}>{i === 0 ? "f" : i === 1 ? <Camera size={14} /> : "𝕏"}</a>)}
-        </div>
-      </div>
-      <header className={`site-header${animated ? " agency-header" : ""}`}>
-        <a className="brand" href="/" aria-label="Vizag Chamber home">
-          <img
-            src={asset(content.logo)}
-            alt="VCCI emblem"
-            width={64}
-            height={66}
-          />
-          <span>
-            VIZAG CHAMBER<small>COMMERCE & INDUSTRY</small>
-          </span>
-        </a>
-        <NavigationMenu
-          className="desktop-navigation"
-          viewport={false}
-          aria-label="Main navigation"
-        >
-          <NavigationMenuList>
-            {groups.map((g) => (
-              <NavigationMenuItem key={g.label}>
-                {g.items.length ? <>
-                <NavigationMenuTrigger className="nav-trigger">
-                  {g.label}
-                </NavigationMenuTrigger>
-                <NavigationMenuContent className="nav-panel">
-                  {g.items.map((i) => (
-                    <NavigationMenuLink asChild key={i.href}>
-                      <a href={i.href}>{i.label}</a>
-                    </NavigationMenuLink>
-                  ))}
-                </NavigationMenuContent>
-                </> : <NavigationMenuLink asChild><a className="nav-direct" href={g.href}>{g.label}</a></NavigationMenuLink>}
-              </NavigationMenuItem>
-            ))}
-          </NavigationMenuList>
-        </NavigationMenu>
-        <a className="button button-gold header-join" href="/join">
-          Become a member
-        </a>
-        <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild>
-            <button className="mobile-menu" aria-label="Open navigation menu">
-              <Menu />
-            </button>
-          </SheetTrigger>
-          <SheetContent className="menu-sheet">
-            <SheetTitle>Explore the Chamber</SheetTitle>
-            <div className="menu-groups">
-              {groups.map((g) => (
-                <div key={g.label}>
-                  {g.items.length ? <>
-                  <h3>{g.label}</h3>
-                  {g.items.map((i) => (
-                    <a
-                      key={i.href}
-                      href={i.href}
-                      onClick={() => setOpen(false)}
-                    >
-                      {i.label}
-                    </a>
-                  ))}
-                  </> : <a href={g.href} onClick={() => setOpen(false)}>{g.label}</a>}
-                </div>
-              ))}
-              <div>
-                <h3>The Chamber</h3>
-                <a href="/join" onClick={() => setOpen(false)}>Become a member</a>
-                <a href="/about-us" onClick={() => setOpen(false)}>About Us</a>
-                <a href="/contact-us" onClick={() => setOpen(false)}>Contact Us</a>
-                {content.footerGroups[0].links.map((l) => (
-                  <a key={l.href} href={localLink(l.href)}>
-                    {l.label}
-                  </a>
-                ))}
-              </div>
-            </div>
-          </SheetContent>
-        </Sheet>
-      </header>
-    </>
-  );
+  return <Header />;
 }
 export function SiteFooter() {
   return (
-    <footer className="site-footer">
+    <footer className="site-footer" data-reveal>
       <div className="footer-top">
         <div className="footer-brand">
           <img

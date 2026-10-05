@@ -1,8 +1,9 @@
 "use client";
 import HeroOne from "@/components/ui/hero-01";
-import { SiteHeader, SiteFooter } from "@/components/site-shell";
+import { SiteFooter } from "@/components/site-shell";
 import { HomeSections } from "@/components/home-sections";
 import { ChamberMotion } from "@/components/ui/chamber-motion";
+import { FloatingCard } from "@/components/ui/floating-card";
 import {
   Building2,
   FileCheck2,
@@ -15,7 +16,6 @@ export default function Home() {
   return (
     <>
       <ChamberMotion />
-      <SiteHeader animated />
       <main id="main-content">
         <HeroOne />
         <div className="ribbon">
@@ -83,20 +83,30 @@ export default function Home() {
                 href: "/alumni_forum",
               },
             ].map((item, i) => (
-              <a
-                className="service-card"
-                data-reactive
+              <FloatingCard
                 key={item.name}
-                href={item.href}
+                className="h-full"
+                maxRotation={9}
+                scaleOnHover={1.015}
+                glare={true}
               >
-                <span className="service-number">0{i + 1}</span>
-                <item.icon size={30} strokeWidth={1.25} />
-                <h3>{item.name}</h3>
-                <p>{item.sub}</p>
-                <span className="service-more">
-                  Discover more <span>↗</span>
-                </span>
-              </a>
+                <a
+                  className="service-card h-full flex flex-col justify-between"
+                  data-reactive
+                  href={item.href}
+                  style={{ transformStyle: "preserve-3d" }}
+                >
+                  <span className="service-number" style={{ transform: "translateZ(18px)" }}>0{i + 1}</span>
+                  <div>
+                    <item.icon size={30} strokeWidth={1.25} style={{ transform: "translateZ(25px)" }} />
+                    <h3 style={{ transform: "translateZ(28px)" }}>{item.name}</h3>
+                    <p style={{ transform: "translateZ(18px)" }}>{item.sub}</p>
+                  </div>
+                  <span className="service-more" style={{ transform: "translateZ(22px)" }}>
+                    Discover more <span>↗</span>
+                  </span>
+                </a>
+              </FloatingCard>
             ))}
           </div>
         </section>

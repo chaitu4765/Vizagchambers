@@ -344,7 +344,7 @@ export function HomeSections() {
           </div>
         </div>
       </section>
-      <div className="meeting-photo" aria-label="Business meeting">
+      <div className="meeting-photo" aria-label="Business meeting" data-reveal>
         <img
           src="/assets/member-bg.jpg"
           alt="Business leaders meeting around a conference table"

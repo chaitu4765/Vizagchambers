@@ -1,104 +1,111 @@
 "use client";
-import { useRef, useState } from "react";
-import { ArrowDown, ChevronLeft, ChevronRight } from "lucide-react";
-const images = [
-  "18fbf719fde424a68021106365f61ccf.jpg",
-  "72e3eeeeac4348e08a86a5560456e749.jpg",
-  "4c14c3d92864c0bb08f4264ec0dec55b.jpeg",
-];
-export default function HeroOne() {
-  const [slide, setSlide] = useState(0);
-  const hero = useRef<HTMLElement>(null);
+import HeroSection from "@/components/ui/hero-01-utils/hero";
+import type { NavigationSection } from "@/components/ui/hero-01-utils/header";
+import Header from "@/components/ui/hero-01-utils/header";
+import BrandSlider, {
+  BrandList,
+} from "@/components/ui/hero-01-utils/brand-slider";
+import type { AvatarList } from "@/components/ui/hero-01-utils/hero";
+import { content, localLink } from "@/lib/site-data";
+
+export default function AgencyHeroSection() {
+  const avatarList: AvatarList[] = [
+    {
+      image: "/assets/18fbf719fde424a68021106365f61ccf.jpg",
+    },
+    {
+      image: "/assets/72e3eeeeac4348e08a86a5560456e749.jpg",
+    },
+    {
+      image: "/assets/4c14c3d92864c0bb08f4264ec0dec55b.jpeg",
+    },
+    {
+      image: "/assets/a0ddb35059a90ffa27aaeeb64159c1aa.png",
+    },
+  ];
+
+  const rawNav: NavigationSection[] = content.navigation
+    .filter((g) => g.label !== "Join")
+    .map((g) => ({
+      title: g.label,
+      href: localLink(g.href),
+      isActive: g.label === "Home",
+      items: g.items.map((i) => ({
+        label: i.label,
+        href: localLink(i.href),
+      })),
+    }));
+
+  const navigationData: NavigationSection[] = [
+    rawNav[0],
+    {
+      title: "About Us",
+      href: "/about-us",
+      items: [],
+    },
+    ...rawNav.slice(1),
+  ];
+
+  const brandList: BrandList[] = [
+    {
+      name: "VCCI Commerce & Industry",
+      sub: "Voice of Enterprise Since 1931",
+      tag: "Apex Chamber",
+      image: "/assets/a0ddb35059a90ffa27aaeeb64159c1aa.png",
+    },
+    {
+      name: "eCOO Digital Export Certification",
+      sub: "Trade Beyond Borders",
+      tag: "Trade Facilitation",
+      image: "/assets/wing1.png",
+    },
+    {
+      name: "VCCI Women's Wing",
+      sub: "Empowering Women in Business",
+      tag: "Leadership",
+      image: "/assets/wing1.png",
+    },
+    {
+      name: "VCCI Youth Wing",
+      sub: "Next-Gen Leaders & Innovators",
+      tag: "Innovation",
+      image: "/assets/wing1.png",
+    },
+    {
+      name: "Enterprise Helpdesk",
+      sub: "Direct Business & Policy Advisory",
+      tag: "Support",
+      image: "/assets/wing1.png",
+    },
+    {
+      name: "Alumni Forum",
+      sub: "Experience that Inspires Growth",
+      tag: "Mentorship",
+      image: "/assets/wing1.png",
+    },
+    {
+      name: "Maritime & Port Logistics",
+      sub: "East Coast Gateway of India",
+      tag: "Industry",
+      image: "/assets/wing1.png",
+    },
+    {
+      name: "CSR & Community Welfare",
+      sub: "Sustainable Regional Progress",
+      tag: "Community",
+      image: "/assets/wing1.png",
+    },
+  ];
+
   return (
-        <section
-          className="hero agency-hero"
-          ref={hero}
-          onPointerLeave={() => { hero.current?.style.setProperty("--mx", "0px"); hero.current?.style.setProperty("--my", "0px"); }}
-          onPointerMove={(e) => {
-            if (e.pointerType !== "mouse" || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-            hero.current?.style.setProperty(
-              "--mx",
-              `${(e.clientX / innerWidth - 0.5) * 16}px`,
-            );
-            hero.current?.style.setProperty(
-              "--my",
-              `${(e.clientY / innerHeight - 0.5) * 12}px`,
-            );
-          }}
-        >
-          <div className="hero-images">
-            {images.map((src, i) => (
-              <img
-                className={slide === i ? "active" : ""}
-                src={`/assets/${src}`}
-                key={src}
-                alt={
-                  [
-                    "The Vizag Chamber community",
-                    "VCCI Women's Wing",
-                    "VCCI annual general meeting",
-                  ][i]
-                }
-              />
-            ))}
-          </div>
-          <div className="hero-coordinate">
-            <span>VISAKHAPATNAM, INDIA</span>
-            <span>17.6868° N &nbsp; 83.2185° E</span>
-          </div>
-          <div className="hero-content">
-            <p className="eyebrow">CONNECTING BUSINESS. BUILDING TOMORROW.</p>
-            <h1>
-              <span className="hero-line"><span>A legacy.</span></span>
-              <span className="hero-line"><span>A <em>limitless</em> future.</span></span>
-            </h1>
-            <p className="hero-description">
-              The Vizagapatam Chamber of Commerce and Industry.
-              <br />
-              Bringing businesses, people and possibilities together.
-            </p>
-            <div className="hero-actions">
-              <a href="#chamber" className="button button-gold">
-                Explore the Chamber
-              </a>
-              <a href="/join" className="text-link">
-                Grow with us <span>↗</span>
-              </a>
-            </div>
-          </div>
-          <div className="hero-bottom">
-            <a href="#chamber" className="scroll-hint">
-              <span className="scroll-circle">
-                <ArrowDown size={17} />
-              </span>{" "}
-              SCROLL TO DISCOVER
-            </a>
-            <div className="hero-caption">
-              <span>A CITY OF POSSIBILITIES</span>
-              <p>Rooted in Vizag. Connected to the world.</p>
-            </div>
-            <div className="slide-controls">
-              <div className="hero-thumbnails" aria-label="Choose background photo">
-                {images.map((src, index) => <button key={src} aria-label={`Show background photo ${index + 1}`} aria-pressed={slide === index} onClick={() => setSlide(index)}><img src={`/assets/${src}`} alt="" /></button>)}
-              </div>
-              <span>
-                0{slide + 1}
-                <i>/ 03</i>
-              </span>
-              <button
-                onClick={() => setSlide((slide + 2) % 3)}
-                aria-label="Previous hero image"
-              >
-                <ChevronLeft size={18} />
-              </button>
-              <button
-                onClick={() => setSlide((slide + 1) % 3)}
-                aria-label="Next hero image"
-              >
-                <ChevronRight size={18} />
-              </button>
-            </div>
-          </div>
-        </section>
+    <div className="relative">
+      <Header navigationData={navigationData} />
+      <main>
+        <HeroSection avatarList={avatarList} />
+        <BrandSlider brandList={brandList} />
+      </main>
+    </div>
   );
 }
+
+export { AgencyHeroSection, AgencyHeroSection as HeroOne };
