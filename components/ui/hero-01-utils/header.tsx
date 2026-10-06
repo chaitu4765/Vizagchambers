@@ -62,6 +62,8 @@ const defaultVizagNavigation: NavigationSection[] = [
 
 import { usePathname } from "next/navigation";
 
+import { openMemberModal, useMemberModal } from "@/components/member-modal-context";
+
 export default function Header({
   navigationData,
   className,
@@ -69,6 +71,7 @@ export default function Header({
   const [sticky, setSticky] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const { isLoggedIn, user } = useMemberModal();
 
   const baseNav =
     navigationData && navigationData.length > 0 && navigationData[0].items
@@ -220,16 +223,34 @@ export default function Header({
 
         {/* Desktop CTA & Mobile Toggle */}
         <div className="flex items-center gap-3">
-          <a
-            href="/join"
-            className="hidden sm:inline-flex items-center text-xs xl:text-sm font-semibold rounded-full h-9 xl:h-10 px-3.5 xl:px-5 bg-gradient-to-r from-amber-200 via-amber-300 to-amber-200 text-slate-900 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300 group cursor-pointer border border-amber-300/70 shrink-0 whitespace-nowrap"
-          >
-            <span>Become a member</span>
-            <ArrowUpRight
-              size={14}
-              className="ml-1.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 shrink-0"
-            />
-          </a>
+          {isLoggedIn ? (
+            <a
+              href="/dashboard"
+              className="hidden sm:inline-flex items-center gap-2 text-xs xl:text-sm font-semibold rounded-full h-9 xl:h-10 px-3.5 xl:px-4.5 bg-linear-to-r from-emerald-600 via-teal-600 to-cyan-700 text-white shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300 group cursor-pointer border border-emerald-400/40 shrink-0 whitespace-nowrap"
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />
+              <span>Member Dashboard</span>
+              <ArrowUpRight
+                size={14}
+                className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 shrink-0"
+              />
+            </a>
+          ) : (
+            <a
+              href="/join"
+              onClick={(e) => {
+                e.preventDefault();
+                openMemberModal("join");
+              }}
+              className="hidden sm:inline-flex items-center text-xs xl:text-sm font-semibold rounded-full h-9 xl:h-10 px-3.5 xl:px-5 bg-gradient-to-r from-amber-200 via-amber-300 to-amber-200 text-slate-900 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300 group cursor-pointer border border-amber-300/70 shrink-0 whitespace-nowrap"
+            >
+              <span>Become a member</span>
+              <ArrowUpRight
+                size={14}
+                className="ml-1.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 shrink-0"
+              />
+            </a>
+          )}
 
           {/* Mobile Menu Sheet */}
           <div className="lg:hidden">
@@ -311,13 +332,26 @@ export default function Header({
                   </div>
 
                   <div className="pt-4 border-t border-border/60 flex flex-col gap-3 mt-auto">
-                    <a
-                      href="/join"
-                      className="w-full text-center py-3 rounded-full text-sm font-semibold bg-gradient-to-r from-amber-200 via-amber-300 to-amber-200 text-slate-900 shadow-sm"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Become a member ↗
-                    </a>
+                    {isLoggedIn ? (
+                      <a
+                        href="/dashboard"
+                        onClick={() => setIsOpen(false)}
+                        className="w-full text-center py-3 rounded-full text-sm font-semibold bg-linear-to-r from-emerald-600 via-teal-600 to-cyan-700 text-white shadow-sm cursor-pointer block"
+                      >
+                        ✦ Member Dashboard ({user?.name ? user.name.split(" ")[0] : "Active"}) ↗
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        className="w-full text-center py-3 rounded-full text-sm font-semibold bg-gradient-to-r from-amber-200 via-amber-300 to-amber-200 text-slate-900 shadow-sm cursor-pointer"
+                        onClick={() => {
+                          setIsOpen(false);
+                          openMemberModal("join");
+                        }}
+                      >
+                        Become a member ↗
+                      </button>
+                    )}
                     <div className="flex items-center justify-between text-xs text-muted-foreground px-2 pt-2">
                       <a href="/about-us">About Us</a>
                       <span>•</span>

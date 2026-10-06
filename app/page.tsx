@@ -1,5 +1,7 @@
 "use client";
+
 import HeroOne from "@/components/ui/hero-01";
+import { VcciGlyphSection } from "@/components/vcci-glyph-portal";
 import { SiteFooter } from "@/components/site-shell";
 import { HomeSections } from "@/components/home-sections";
 import { ChamberMotion } from "@/components/ui/chamber-motion";
@@ -12,13 +14,17 @@ import {
   GraduationCap,
   Sparkles,
 } from "lucide-react";
+
 export default function Home() {
   return (
     <>
       <ChamberMotion />
       <main id="main-content">
+        {/* Restored Hero section with the 3 original picture cards & brand ticker */}
         <HeroOne />
-        <div className="ribbon">
+
+        {/* Marquee Ribbon */}
+        <div className="ribbon" aria-hidden="true">
           <div>
             ENTERPRISE <span>✦</span> COMMUNITY <span>✦</span> PROGRESS{" "}
             <span>✦</span> VISAKHAPATNAM <span>✦</span> ENTERPRISE{" "}
@@ -26,6 +32,11 @@ export default function Home() {
             VISAKHAPATNAM <span>✦</span>
           </div>
         </div>
+
+        {/* VCCI Scroll-Driven Camera Through Live Type (Glyph Portal) */}
+        <VcciGlyphSection />
+
+        {/* Core Chamber Initiatives Grid */}
         <section className="section chamber-section" id="chamber">
           <div className="section-heading" data-reveal>
             <div>
@@ -96,13 +107,25 @@ export default function Home() {
                   href={item.href}
                   style={{ transformStyle: "preserve-3d" }}
                 >
-                  <span className="service-number" style={{ transform: "translateZ(18px)" }}>0{i + 1}</span>
+                  <span
+                    className="service-number"
+                    style={{ transform: "translateZ(18px)" }}
+                  >
+                    0{i + 1}
+                  </span>
                   <div>
-                    <item.icon size={30} strokeWidth={1.25} style={{ transform: "translateZ(25px)" }} />
+                    <item.icon
+                      size={30}
+                      strokeWidth={1.25}
+                      style={{ transform: "translateZ(25px)" }}
+                    />
                     <h3 style={{ transform: "translateZ(28px)" }}>{item.name}</h3>
                     <p style={{ transform: "translateZ(18px)" }}>{item.sub}</p>
                   </div>
-                  <span className="service-more" style={{ transform: "translateZ(22px)" }}>
+                  <span
+                    className="service-more"
+                    style={{ transform: "translateZ(22px)" }}
+                  >
                     Discover more <span>↗</span>
                   </span>
                 </a>
@@ -110,6 +133,8 @@ export default function Home() {
             ))}
           </div>
         </section>
+
+        {/* Existing Homepage Sections */}
         <HomeSections />
       </main>
       <SiteFooter />

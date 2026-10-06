@@ -1,0 +1,580 @@
+[
+  {
+    "id": "nav-ap",
+    "title": "AP Government Website Links",
+    "links": [
+      {
+        "name": "AP Govt CM",
+        "url": "http://ap.gov.in/government/chief-minister-office"
+      },
+      {
+        "name": "Visakhaptnam District",
+        "url": "http://visakhapatnam.nic.in/"
+      },
+      {
+        "name": "AP Portal",
+        "url": "https://www.ap.gov.in/"
+      },
+      {
+        "name": "AP Online",
+        "url": "http://www.aponline.gov.in/apportal/index.asp"
+      },
+      {
+        "name": "AP Govt FINANCE DEPARTMENT",
+        "url": "https://www.apfinance.gov.in/govt-sites.html"
+      },
+      {
+        "name": "ANDHRA PRADESH STATE HOUSING CORPORATION",
+        "url": "https://apgovhousing.apcfss.in/"
+      },
+      {
+        "name": "AP Govt registration and Stamps Department",
+        "url": "http://registration.ap.gov.in/"
+      },
+      {
+        "name": "GVMC",
+        "url": "https://www.gvmc.gov.in/gvmc/"
+      },
+      {
+        "name": "Government of India Ministry of Housing &amp; Urban Affairs Central Public Works Department",
+        "url": "https://cpwd.gov.in/officeDetails.aspx?State=ANDHRA%20PRADESH"
+      },
+      {
+        "name": "AP Innovation Society",
+        "url": "http://www.apinnovationsociety.com/"
+      },
+      {
+        "name": "AP Dept of Industries",
+        "url": "https://www.apindustries.gov.in/APIndus/Default.aspx"
+      },
+      {
+        "name": "Andhra Pradesh Government",
+        "url": "http://www.andhrapradesh.com/"
+      },
+      {
+        "name": "AndhraPradesh Portal",
+        "url": "http://www.aponline.gov.in/"
+      },
+      {
+        "name": "A.P.Dept. of Womens Dev.&amp; Child Welfare",
+        "url": "http://www.apanganwadi.com/"
+      },
+      {
+        "name": "A.P.Commercial Tax",
+        "url": "http://www.apvatvision.com/Andhra"
+      },
+      {
+        "name": "A.P.B.C.Co-op.Finance Corporation",
+        "url": "http://www.backwardclasscorporation.org/"
+      },
+      {
+        "name": "Anti-Corruption Bureau",
+        "url": "http://www.acbap.org/"
+      },
+      {
+        "name": "A.P.Dev.Co-op. Federation",
+        "url": "http://www.apdairy.com/"
+      },
+      {
+        "name": "A.P.Elect. Regulatory Authority",
+        "url": "http://www.ercap.org/"
+      },
+      {
+        "name": "A.P.Forests Dev. Corporation",
+        "url": "http://apfdc.apts.gov.in/"
+      },
+      {
+        "name": "A.P.Genco",
+        "url": "http://www.apgenco.com/"
+      },
+      {
+        "name": "A.P.Transco",
+        "url": "http://www.aptranscorp.com/"
+      },
+      {
+        "name": "A.P. Govt. Orders",
+        "url": "http://www.apts.gov.in/"
+      },
+      {
+        "name": "A.P. Housing Board",
+        "url": "http://aphb.apts.gov.in/"
+      },
+      {
+        "name": "A.P. Indus. Dev.Corp",
+        "url": "http://www.apind.com/"
+      },
+      {
+        "name": "A.P. I.T.C.O",
+        "url": "http://www.apitco.org/"
+      },
+      {
+        "name": "A.P.Mines &amp; Geology",
+        "url": "http://www.minces.com/"
+      },
+      {
+        "name": "A.P.Police",
+        "url": "http://www.apstatepolice.org/"
+      },
+      {
+        "name": "A.P.Pollution Control Board",
+        "url": "http://www.apspcb.org/"
+      },
+      {
+        "name": "A.P.Press Academy",
+        "url": "http://www.apts.gov.in/"
+      },
+      {
+        "name": "A.P.Public Ditribution System",
+        "url": "http://www.nic.in/appds"
+      },
+      {
+        "name": "A.P.Public Service Commission",
+        "url": "http://www.appsc.org/"
+      },
+      {
+        "name": "A.P.S.C.Of Higher Education",
+        "url": "http://www.apsche.com/"
+      },
+      {
+        "name": "A.P.S.Co-op. Marketing Federation",
+        "url": "http://www.apscmf.gov.in/"
+      },
+      {
+        "name": "A.P.State Financial Corporation",
+        "url": "http://www.apsic.com/"
+      },
+      {
+        "name": "A.P.State Housing Corporation",
+        "url": "http://www.apshcil.com/"
+      },
+      {
+        "name": "A.P. State Minority Financial Corporation",
+        "url": "http://www.apshcil.com/"
+      },
+      {
+        "name": "A.P.State Trading Corporation",
+        "url": "http://www.apstc.com/"
+      },
+      {
+        "name": "A.P.Tranport Corp.",
+        "url": "http://www.andhrapradesh.com/"
+      },
+      {
+        "name": "A.P.Tech. Dev.Promotion Centre",
+        "url": "http://www.aptdc.com/"
+      },
+      {
+        "name": "A.P. Technology Services Ltd",
+        "url": "http://www.apts.gov.in/"
+      },
+      {
+        "name": "A.P.Telephones",
+        "url": "http://www.aptelcom.gov.in/"
+      },
+      {
+        "name": "A.P.Tourism",
+        "url": "http://www.aptourism.com/"
+      },
+      {
+        "name": "A.P.Infrastucture",
+        "url": "http://www.aponline.gov.in/"
+      },
+      {
+        "name": "A.P.Vidya Vidhana Parishad",
+        "url": "http://www.aphealth.org/"
+      },
+      {
+        "name": "Board Of Intermediate Education",
+        "url": "http://www.interboardap.nic.in/"
+      },
+      {
+        "name": "CARD- Dept. of Registration &amp; Stamp",
+        "url": "http://www.ap.gov.in/card"
+      },
+      {
+        "name": "Civil Suplies Corporation",
+        "url": "http://www.apts.gov.in/ramwec"
+      },
+      {
+        "name": "Chief Minister&rsquo;s Empowerment of Youth",
+        "url": "http://www.cmey.com/"
+      },
+      {
+        "name": "Commisionerate of Industries",
+        "url": "http://www.apind.com/"
+      },
+      {
+        "name": "Commisionerate of Family Welfare",
+        "url": "http://www.apsect.gov.in/"
+      },
+      {
+        "name": "Commisionerate of Fisheries",
+        "url": "http://www.apfishries.com/"
+      },
+      {
+        "name": "Directorate of AIDS Control Project",
+        "url": "http://www.unaids.org/"
+      },
+      {
+        "name": "Directorate of Horticulture",
+        "url": "http://www.aphorticulture.com/"
+      },
+      {
+        "name": "Directorate of School Education",
+        "url": "http://www.schoolsinap.com/"
+      },
+      {
+        "name": "Directorate of State Institute of Edu.Tech",
+        "url": "http://www.siethyd.nic.in/"
+      },
+      {
+        "name": "Directorate of Tribal Cultural Research &amp; Training Institute",
+        "url": "http://www.apts.gov.in/aptribes"
+      },
+      {
+        "name": "Directorate of Women Dev. &amp;Child Welfare",
+        "url": "http://www.ap.nic.in/"
+      },
+      {
+        "name": "Direct Primary Education Programme",
+        "url": "http://www.apdped2000.com/"
+      },
+      {
+        "name": "Dr.B.R.Ambedkar Open University",
+        "url": "http://www.rbraou.com/"
+      },
+      {
+        "name": "Dr.MCR HRD Institute Of AP",
+        "url": "http://www.hrdap.gov.in/"
+      },
+      {
+        "name": "DWACRA",
+        "url": "http://www.ap.nic.in/"
+      },
+      {
+        "name": "Envir Protection,Training &amp; Research",
+        "url": "http://www.eptri.com/"
+      },
+      {
+        "name": "Forest Department",
+        "url": "http://www.ap.nic.in/"
+      },
+      {
+        "name": "Girijan Co-op Corporation Lts",
+        "url": "http://www.apts.gov.in/aptribes"
+      },
+      {
+        "name": "Hyderbad Muncipal Coporation",
+        "url": "http://www.ourmch.com/"
+      },
+      {
+        "name": "Guntur Muncipal Coporation",
+        "url": "http://www.gunturmuncipality.com/"
+      },
+      {
+        "name": "Tirupathi Urban Dev.Authority",
+        "url": "http://www.tuda.org/"
+      },
+      {
+        "name": "Tirupathi Zoo",
+        "url": "http://www.tirupathi.zoo.org/"
+      },
+      {
+        "name": "Vijayawada Muncipal Coporation",
+        "url": "http://www.vijayawada.com/"
+      },
+      {
+        "name": "Visakapatnam Muncipal Coporation",
+        "url": "http://www.visakapatnammuncipalcoporation.com/"
+      },
+      {
+        "name": "Hi Tech City",
+        "url": "http://www.tinlocity.com/"
+      },
+      {
+        "name": "Software Tech. Park of India",
+        "url": "http://www.stph.net/"
+      },
+      {
+        "name": "Hyderbad Metro Water Supply &amp; Sewerage Board",
+        "url": "http://www.hyderabadwater.gov.in/"
+      },
+      {
+        "name": "IAS Officers Address",
+        "url": "http://www.apts.gov.in/address"
+      },
+      {
+        "name": "Information Tech. &amp; Commuin. Dept",
+        "url": "http://www.ap-it.com/"
+      },
+      {
+        "name": "Irrigaton Department",
+        "url": "http://www.apgov.in/apirrigation"
+      },
+      {
+        "name": "JNTU",
+        "url": "http://www.jntu.ac.in/"
+      },
+      {
+        "name": "University of Hyderabad",
+        "url": "http://www.uohyd.emet.in/"
+      },
+      {
+        "name": "Panchayath Raj Engineering",
+        "url": "http://www.ap.in.in/nw"
+      },
+      {
+        "name": "Roads &amp; Buildings Department",
+        "url": "http://www.aproads.com/"
+      },
+      {
+        "name": "Transport Department",
+        "url": "http://www.tats.gov.in/transport"
+      },
+      {
+        "name": "Small Savings",
+        "url": "http://www.apts.gov.in/apsmallsavings"
+      },
+      {
+        "name": "Social Welfare Department",
+        "url": "http://swd.apts.gov.in/"
+      },
+      {
+        "name": "Social Welfare Residential Schools",
+        "url": "http://www.apts.gov.in/apswrs"
+      },
+      {
+        "name": "State Board of Technical Edu.&amp; Training",
+        "url": "http://www.sbtet.ap.nic.in/"
+      },
+      {
+        "name": "Velugu",
+        "url": "http://www.velugu.org/"
+      },
+      {
+        "name": "Corporation.com",
+        "url": "http://www.sowkarmyuam.com/"
+      },
+      {
+        "name": "Andhra Pradesh Power Generation Corporation (APGENCO)",
+        "url": "http://www.apgenco.gov.in/"
+      },
+      {
+        "name": "Andhra Pradesh Transmission Corporation (AP Transco)",
+        "url": "http://www.aptransco.gov.in/"
+      },
+      {
+        "name": "Andhra Pradesh Public Service Commission (APPSC )",
+        "url": "http://website.apspsc.gov.in/"
+      },
+      {
+        "name": "Andhra Pradesh Tourism (AP TOURISM)",
+        "url": "http://aptdc.in/"
+      },
+      {
+        "name": "Andhra Pradesh State Road Transport Corporation (APSRTC)",
+        "url": "http://www.apsrtc.gov.in/"
+      },
+      {
+        "name": "Institute of Banking Personnel Selection (IBPS)",
+        "url": "http://www.ibps.in/"
+      },
+      {
+        "name": "DEFENCE RESEARCH &amp; DEVELOPMENT ORGNISATION (DRDO)",
+        "url": "http://drdo.gov.in/"
+      },
+      {
+        "name": "DEFENCE RESEARCH &amp; DEVELOPMENT ORGNISATION (DRDO)",
+        "url": "http://drdo.gov.in/"
+      },
+      {
+        "name": "DEFENCE RESEARCH &amp; DEVELOPMENT ORGNISATION (DRDL)",
+        "url": "http://drdo.gov.in/"
+      },
+      {
+        "name": "Railway Recruitment Board",
+        "url": "http://www.rrbsec.org/"
+      },
+      {
+        "name": "Staff Selection Commision (SSC)",
+        "url": "http://www.sscsr.gov.in/"
+      },
+      {
+        "name": "Department of Telecommunications",
+        "url": "http://www.dot.gov.in/"
+      },
+      {
+        "name": "Union Public Service Commission (UPSC)",
+        "url": "http://www.upsc.gov.in/"
+      },
+      {
+        "name": "Goods and Services Tax",
+        "url": "https://www.gst.gov.in/"
+      },
+      {
+        "name": "Goods and Services Tax Network",
+        "url": "https://www.gstn.org/"
+      },
+      {
+        "name": "AP Govt Go&rsquo;s",
+        "url": "http://goir.ap.gov.in/"
+      }
+    ]
+  },
+  {
+    "id": "nav-central",
+    "title": "Central Govt Links",
+    "links": [
+      {
+        "name": "President of India",
+        "url": "https://presidentofindia.gov.in/"
+      },
+      {
+        "name": "Vice President of India",
+        "url": "http://vicepresidentofindia.nic.in/"
+      },
+      {
+        "name": "Directorate of Public Grievances",
+        "url": "http://dpg.bharatsarkar.nic.in/"
+      },
+      {
+        "name": "Performance Management",
+        "url": "http://performance.gov.in/"
+      },
+      {
+        "name": "Department of Ocean Development",
+        "url": "http://dod.nic.in/"
+      },
+      {
+        "name": "Department of Atomic Energy",
+        "url": "http://www.dae.gov.in/"
+      },
+      {
+        "name": "Nuclear Fuel complex",
+        "url": "http://www.nucfuel.gov.in/"
+      },
+      {
+        "name": "Department of Development of North Eastern Region",
+        "url": "http://northeast.nic.in/"
+      },
+      {
+        "name": "Directorate of Atomic Minerals",
+        "url": "http://www.dae.gov.in/amd/amd_home.htm"
+      },
+      {
+        "name": "Central Public Works Department",
+        "url": "http://cpwd.gov.in/"
+      },
+      {
+        "name": "Council on Trade &amp; Industry",
+        "url": "http://indiaimage.nic.in/pmcouncils/tic/"
+      },
+      {
+        "name": "Economic Advisory Council",
+        "url": "http://indiaimage.nic.in/pmcouncils/eac/"
+      },
+      {
+        "name": "Group on Telecommunications",
+        "url": "http://indiaimage.nic.in/pmcouncils/got/"
+      }
+    ]
+  },
+  {
+    "id": "nav-district",
+    "title": "District Links",
+    "links": [
+      {
+        "name": "AP Assembly",
+        "url": "http://www.aplegislature.org/"
+      },
+      {
+        "name": "AP CID",
+        "url": "https://www.grotal.com/www.cidap.gov.in_infoj!_b@jjg$_Se.aspx"
+      },
+      {
+        "name": "AP eprocurement",
+        "url": "http://www.eprocurement.gov.in/"
+      },
+      {
+        "name": "AP GOs",
+        "url": "http://goir.ap.gov.in/"
+      },
+      {
+        "name": "AP Governor",
+        "url": "http://www.ap.nic.in/"
+      },
+      {
+        "name": "AP High Court",
+        "url": "http://www.ap.nic.in/"
+      },
+      {
+        "name": "AP Housing Board",
+        "url": "http://www.aphb.gov.in/"
+      },
+      {
+        "name": "AP Land Records",
+        "url": "http://www.meebhoomi.ap.gov.in/"
+      },
+      {
+        "name": "AP Online",
+        "url": "http://www.aponline.gov.in/apportal/index.asp"
+      },
+      {
+        "name": "AP Police",
+        "url": "http://ww1.apstatepolice.org/"
+      },
+      {
+        "name": "Ap Transport",
+        "url": "http://www.aptransport.org/"
+      },
+      {
+        "name": "APSCHE",
+        "url": "http://www.apsche.org/apsche_new/"
+      },
+      {
+        "name": "APSRTC",
+        "url": "http://www.apsrtc.gov.in/"
+      },
+      {
+        "name": "APSRTC online",
+        "url": "http://www.apsrtconline.in/oprs-web/"
+      },
+      {
+        "name": "Aptransco",
+        "url": "http://www.aptransco.gov.in/transco/"
+      },
+      {
+        "name": "Intermediate Board",
+        "url": "http://bieap.gov.in/"
+      },
+      {
+        "name": "JNTU",
+        "url": "http://jntuh.ac.in/new/"
+      }
+    ]
+  },
+  {
+    "id": "nav-state",
+    "title": "State Govt Links",
+    "links": [
+      {
+        "name": "GVMC",
+        "url": "https://www.gvmc.gov.in/gvmc/"
+      }
+    ]
+  },
+  {
+    "id": "nav-go",
+    "title": "Go Links",
+    "links": [
+      {
+        "name": "AP GOs - Government of Andhra Pradesh",
+        "url": "https://goir.ap.gov.in/"
+      },
+      {
+        "name": "AP E-Procurement Portal",
+        "url": "https://www.apeprocurement.gov.in/"
+      }
+    ]
+  }
+]

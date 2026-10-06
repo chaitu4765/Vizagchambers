@@ -74,12 +74,6 @@ export function SiteFooter() {
       </div>
       <div className="footer-bottom">
         <span>Vizag Chamber (P) Ltd 2021</span>
-        <span>
-          Original website by{" "}
-          <a href="https://thecolourmoon.com/" target="_blank" rel="noreferrer">
-            Colourmoon
-          </a>
-        </span>
         <a href="#top" className="back-top" aria-label="Back to top">
           BACK TO TOP <ChevronUp size={16} />
         </a>

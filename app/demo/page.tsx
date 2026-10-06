@@ -1,9 +1,9 @@
-import HeroOneDemo from "@/components/ui/demo";
+import WorksWheelDemo from "@/components/ui/demo";
 
 export const metadata = {
-  title: "Hero-01 Demo | Vizag Chamber",
+  title: "Works Wheel Demo | Vizag Chamber",
 };
 
 export default function DemoPage() {
-  return <HeroOneDemo />;
+  return <WorksWheelDemo />;
 }

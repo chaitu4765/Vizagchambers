@@ -15,6 +15,9 @@ export const metadata: Metadata = {
   },
 };
 
+import { MemberModalProvider } from "@/components/member-modal-context";
+import { HoveringMemberScreen } from "@/components/hovering-member-screen";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -23,7 +26,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body id="top" className="antialiased">
-        {children}
+        <MemberModalProvider>
+          {children}
+          <HoveringMemberScreen />
+        </MemberModalProvider>
       </body>
     </html>
   );
