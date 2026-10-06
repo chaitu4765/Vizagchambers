@@ -117,7 +117,7 @@ export default function GlyphPortal({
     const marks = section.querySelector<SVGGElement>("[data-gp-marks]")!;
     const choices = section.querySelector<HTMLElement>("[data-gp-choices]")!;
     const buttons = Array.from(choices.querySelectorAll<HTMLButtonElement>("button"));
-    const picker = section.querySelector("[data-gp-select]") as HTMLSelectElement;
+    const picker = section.querySelector("[data-gp-select]") as unknown as HTMLSelectElement;
     const root = scrollParent(section);
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const canvas = document.createElement("canvas");
