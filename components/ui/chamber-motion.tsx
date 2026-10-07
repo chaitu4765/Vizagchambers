@@ -1,12 +1,17 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
+const subscribeMotion = (notify: () => void) => {
+  const query = matchMedia("(prefers-reduced-motion: reduce)");
+  query.addEventListener("change", notify);
+  return () => query.removeEventListener("change", notify);
+};
 /** Scroll-scrubbed transforms + stagger-reveal + parallax-tilt + magnetic buttons.
  * Native page scrolling remains available; fine-pointer effects never run on touch. */
 export function ChamberMotion() {
   const cursor = useRef<HTMLDivElement>(null);
+  const reduced = useSyncExternalStore(subscribeMotion, () => matchMedia("(prefers-reduced-motion: reduce)").matches, () => true);
   useEffect(() => {
-    const reduce = matchMedia("(prefers-reduced-motion: reduce)");
-    if (reduce.matches) return;
+    if (reduced) return;
     const fine = matchMedia("(pointer: fine)").matches;
 
     // --- Scroll-reveal with stagger support ---
@@ -20,7 +25,8 @@ export function ChamberMotion() {
         }),
       { threshold: 0.08 },
     );
-    document.querySelectorAll("[data-reveal]").forEach((e) => {
+    const reveals = document.querySelectorAll("[data-reveal]");
+    reveals.forEach((e) => {
       e.classList.add("will-reveal");
       observer.observe(e);
     });
@@ -64,9 +70,11 @@ export function ChamberMotion() {
       .forEach((el) => counterObserver.observe(el));
 
     // --- Scroll progress + hero parallax ---
-    let ticking = false;
+    let scrollFrame = 0;
+    const hero = document.querySelector<HTMLElement>(".hero");
+    const meetingPhotos = document.querySelectorAll<HTMLElement>(".meeting-photo > img");
     const update = () => {
-      const hero = document.querySelector<HTMLElement>(".hero");
+      scrollFrame = 0;
       if (hero) {
         const p = Math.min(
           1,
@@ -83,9 +91,7 @@ export function ChamberMotion() {
       );
 
       // Section parallax for meeting-photo
-      document
-        .querySelectorAll<HTMLElement>(".meeting-photo > img")
-        .forEach((img) => {
+      meetingPhotos.forEach((img) => {
           const rect = img.parentElement!.getBoundingClientRect();
           const visible = rect.top < innerHeight && rect.bottom > 0;
           if (visible) {
@@ -95,13 +101,9 @@ export function ChamberMotion() {
           }
         });
 
-      ticking = false;
     };
     const scroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(update);
-        ticking = true;
-      }
+      if (!scrollFrame) scrollFrame = requestAnimationFrame(update);
     };
 
     // --- Pointer: cursor ring + reactive cards + magnetic buttons ---
@@ -163,6 +165,12 @@ export function ChamberMotion() {
     document.addEventListener("pointerleave", leave);
     update();
     return () => {
+      cancelAnimationFrame(scrollFrame);
+      // An interrupted reveal must never leave page text invisible.
+      reveals.forEach(element => element.classList.remove("will-reveal"));
+      document.querySelectorAll<HTMLElement>(".stagger-in").forEach(element => element.classList.remove("stagger-in"));
+      document.querySelectorAll<HTMLElement>("[data-reactive], .button-gold, .button-outline, .meeting-photo > img").forEach(element => { element.style.transform = ""; });
+      if (cursor.current) cursor.current.style.opacity = "0";
       observer.disconnect();
       staggerObserver.disconnect();
       counterObserver.disconnect();
@@ -171,7 +179,7 @@ export function ChamberMotion() {
       window.removeEventListener("pointerout", pointerOut);
       document.removeEventListener("pointerleave", leave);
     };
-  }, []);
+  }, [reduced]);
   return (
     <>
       <div className="reading-progress" aria-hidden="true" />

@@ -48,6 +48,7 @@ export default function HeroSection({ avatarList }: HeroSectionProps) {
                 </div>
 
                 <motion.h1
+                  aria-label="A legacy of enterprise. A limitless future."
                   initial={{ opacity: 0, y: 32 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 1, ease: "easeInOut" }}

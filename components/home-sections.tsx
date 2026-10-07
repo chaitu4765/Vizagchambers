@@ -224,10 +224,11 @@ export function HomeSections() {
           </span>
         </div>
         <div className="news-list">
-          {news.map((n, i) => (
-            <a
-              key={n.href}
-              href={n.href}
+          {news.map((n, i) => {
+            const Tag = n.href ? "a" : "div";
+            return <Tag
+              key={n.title}
+              href={n.href || undefined}
               className="news-row"
               target="_blank"
               rel="noreferrer"
@@ -237,13 +238,13 @@ export function HomeSections() {
               </span>
               <div>
                 <span className="news-source">
-                  {new URL(n.href).hostname.replace("www.", "")}
+                  {n.href ? new URL(n.href).hostname.replace("www.", "") : "Archived article · source unavailable"}
                 </span>
                 <h3>{n.title}</h3>
               </div>
-              <span className="news-mark">↗</span>
-            </a>
-          ))}
+              {n.href && <span className="news-mark" aria-hidden="true">↗</span>}
+            </Tag>;
+          })}
           <button
             className="underlined-link news-toggle"
             onClick={() => setAllNews(!allNews)}

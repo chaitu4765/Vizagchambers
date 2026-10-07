@@ -1,7 +1,8 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { User, Lock, ArrowRight, X, Sparkles, CheckCircle2 } from "lucide-react";
+import Link from "next/link";
+import { User, Mail, Lock, ArrowRight, X, CheckCircle2 } from "lucide-react";
 import { useMemberModal } from "@/components/member-modal-context";
 
 // Vertex shader source code
@@ -86,8 +87,6 @@ export function SmokeyBackground({
   className = "",
 }: SmokeyBackgroundProps): React.JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
 
   // Helper to convert hex color to RGB (0-1 range)
   const hexToRgb = (hex: string): [number, number, number] => {
@@ -104,7 +103,6 @@ export function SmokeyBackground({
 
     const gl = canvas.getContext("webgl");
     if (!gl) {
-      console.error("WebGL not supported");
       return;
     }
 
@@ -159,9 +157,22 @@ export function SmokeyBackground({
     const [r, g, b] = hexToRgb(color);
     gl.uniform3f(uColorLocation, r, g, b);
 
-    let animationFrameId: number;
+    let animationFrameId = 0;
+    let visible = false;
+    let disposed = false;
+    let lastFrame = -Infinity;
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let mouse = { x: 0, y: 0, hovering: false };
 
-    const render = () => {
+    const render = (time = 0) => {
+      animationFrameId = 0;
+      if (disposed || !visible || document.hidden) return;
+      // The decorative shader needs only 30 fps; do no GPU work while offscreen.
+      if (!motion.matches && time - lastFrame < 1000 / 30) {
+        animationFrameId = requestAnimationFrame(render);
+        return;
+      }
+      lastFrame = time;
       const width = canvas.clientWidth || 300;
       const height = canvas.clientHeight || 300;
       if (canvas.width !== width || canvas.height !== height) {
@@ -170,49 +181,64 @@ export function SmokeyBackground({
       }
       gl.viewport(0, 0, width, height);
 
-      const currentTime = (Date.now() - startTime) / 1000;
+      const currentTime = motion.matches ? 0 : (Date.now() - startTime) / 1000;
 
       gl.uniform2f(iResolutionLocation, width, height);
       gl.uniform1f(iTimeLocation, currentTime);
       gl.uniform2f(
         iMouseLocation,
-        isHovering ? mousePosition.x : width / 2,
-        isHovering ? height - mousePosition.y : height / 2
+        mouse.hovering ? mouse.x : width / 2,
+        mouse.hovering ? height - mouse.y : height / 2
       );
 
       gl.drawArrays(gl.TRIANGLES, 0, 6);
-      animationFrameId = requestAnimationFrame(render);
+      if (!motion.matches) animationFrameId = requestAnimationFrame(render);
     };
+
+    const resume = () => {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = 0;
+      if (visible && !document.hidden) animationFrameId = requestAnimationFrame(render);
+    };
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      resume();
+    });
+    observer.observe(canvas);
+    const resize = new ResizeObserver(resume);
+    resize.observe(canvas);
+    document.addEventListener("visibilitychange", resume);
+    motion.addEventListener("change", resume);
 
     const handleMouseMove = (event: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
-      setMousePosition({ x: event.clientX - rect.left, y: event.clientY - rect.top });
+      mouse = { x: event.clientX - rect.left, y: event.clientY - rect.top, hovering: true };
     };
-    const handleMouseEnter = () => setIsHovering(true);
-    const handleMouseLeave = () => setIsHovering(false);
+    const handleMouseLeave = () => { mouse.hovering = false; };
 
     canvas.addEventListener("mousemove", handleMouseMove);
-    canvas.addEventListener("mouseenter", handleMouseEnter);
     canvas.addEventListener("mouseleave", handleMouseLeave);
 
-    render();
-
     return () => {
+      disposed = true;
       cancelAnimationFrame(animationFrameId);
+      observer.disconnect();
+      resize.disconnect();
+      document.removeEventListener("visibilitychange", resume);
+      motion.removeEventListener("change", resume);
       canvas.removeEventListener("mousemove", handleMouseMove);
-      canvas.removeEventListener("mouseenter", handleMouseEnter);
       canvas.removeEventListener("mouseleave", handleMouseLeave);
       gl.deleteProgram(program);
       gl.deleteShader(vertexShader);
       gl.deleteShader(fragmentShader);
       gl.deleteBuffer(positionBuffer);
     };
-  }, [isHovering, mousePosition, color]);
+  }, [color]);
 
   const finalBlurClass = blurClassMap[backdropBlurAmount as BlurSize] || blurClassMap["sm"];
 
   return (
-    <div className={`absolute inset-0 w-full h-full overflow-hidden ${className}`}>
+    <div aria-hidden="true" className={`absolute inset-0 w-full h-full overflow-hidden ${className}`} style={{ background: `radial-gradient(ellipse at top, ${color}, #071b26)` }}>
       <canvas ref={canvasRef} className="w-full h-full" />
       <div className={`absolute inset-0 ${finalBlurClass}`}></div>
     </div>
@@ -229,7 +255,7 @@ export interface LoginFormProps {
 
 /**
  * A React component that renders an animated, glassmorphic login form with
- * floating labels, Google login, 1-click executive demo access, and smooth state transitions.
+ * name and email fields and smooth state transitions.
  */
 export function LoginForm({
   title = "Welcome Back",
@@ -238,10 +264,21 @@ export function LoginForm({
   onClose,
   className = "",
 }: LoginFormProps = {}): React.JSX.Element {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [recoveryOpen, setRecoveryOpen] = useState(false);
+  const recoveryTitle = useRef<HTMLHeadingElement>(null);
+  const recoveryTrigger = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (recoveryOpen) recoveryTitle.current?.focus();
+  }, [recoveryOpen]);
+  const closeRecovery = () => {
+    setRecoveryOpen(false);
+    requestAnimationFrame(() => recoveryTrigger.current?.focus());
+  };
   const router = useRouter();
   const { login } = useMemberModal();
 
@@ -251,7 +288,7 @@ export function LoginForm({
     setTimeout(() => {
       setIsLoading(false);
       setIsSuccess(true);
-      login(email || undefined);
+      login(email, name);
       setTimeout(() => {
         onSuccess?.();
         router.push("/dashboard");
@@ -279,7 +316,22 @@ export function LoginForm({
         <p className="mt-2 text-sm text-gray-300">{subtitle}</p>
       </div>
 
-      {isSuccess ? (
+      {recoveryOpen ? (
+        <section
+          aria-labelledby="password-recovery-title"
+          className="space-y-4 text-sm text-slate-200"
+          onKeyDown={(event) => {
+            if (event.key === "Escape") { event.stopPropagation(); closeRecovery(); }
+          }}
+        >
+          <h3 ref={recoveryTitle} id="password-recovery-title" tabIndex={-1} className="text-xl font-semibold text-white focus:outline-none">Recover member access</h3>
+          <p>Contact the Chamber secretariat using your registered email address for help restoring your account access.</p>
+          <a href="mailto:info@vizagchamber.com?subject=Member%20account%20access%20help" className="block break-all font-semibold text-amber-300 underline underline-offset-4">Email info@vizagchamber.com</a>
+          <a href="tel:+917093332606" className="block font-semibold text-amber-300 underline underline-offset-4">Call +91 70933 32606</a>
+          <p className="text-xs text-slate-300">No reset email has been sent. The secretariat will guide you through account recovery.</p>
+          <button type="button" onClick={closeRecovery} className="min-h-11 rounded-lg border border-white/30 px-4 text-white">Back to sign in</button>
+        </section>
+      ) : isSuccess ? (
         <div className="py-8 flex flex-col items-center justify-center text-center space-y-3 animate-in fade-in zoom-in-95 duration-300">
           <div className="p-3 bg-emerald-500/20 text-emerald-400 rounded-full border border-emerald-500/30">
             <CheckCircle2 size={36} />
@@ -291,10 +343,16 @@ export function LoginForm({
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="space-y-2">
+            <label htmlFor="member_name" className="flex items-center gap-2 text-sm text-slate-200"><User size={16} aria-hidden="true" />Full name</label>
+            <input id="member_name" name="fullName" type="text" autoComplete="name" required pattern=".*\S.*" maxLength={100} value={name} onChange={event => setName(event.target.value)} className="block w-full rounded-lg border border-white/30 bg-slate-950/30 px-3 py-2.5 text-sm text-white focus:border-amber-400 focus:outline-none" />
+          </div>
           {/* Email Input with Animated Label */}
           <div className="relative z-0 group">
             <input
               type="email"
+              name="email"
+              autoComplete="email"
               id="floating_email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -304,9 +362,9 @@ export function LoginForm({
             />
             <label
               htmlFor="floating_email"
-              className="absolute text-sm text-gray-300 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-400 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+              className="absolute text-sm text-gray-300 duration-300 transform -translate-y-6 scale-75 top-3 z-10 pointer-events-none origin-[0] peer-focus:left-0 peer-focus:text-blue-400 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
             >
-              <User className="inline-block mr-2 -mt-1" size={16} />
+              <Mail className="inline-block mr-2 -mt-1" size={16} />
               Email Address
             </label>
           </div>
@@ -315,6 +373,8 @@ export function LoginForm({
           <div className="relative z-0 group">
             <input
               type="password"
+              name="password"
+              autoComplete="current-password"
               id="floating_password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -324,7 +384,7 @@ export function LoginForm({
             />
             <label
               htmlFor="floating_password"
-              className="absolute text-sm text-gray-300 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-400 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+              className="absolute text-sm text-gray-300 duration-300 transform -translate-y-6 scale-75 top-3 z-10 pointer-events-none origin-[0] peer-focus:left-0 peer-focus:text-blue-400 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
             >
               <Lock className="inline-block mr-2 -mt-1" size={16} />
               Password
@@ -332,16 +392,14 @@ export function LoginForm({
           </div>
 
           <div className="flex items-center justify-between">
-            <a
-              href="#forgot-password"
-              onClick={(e) => {
-                e.preventDefault();
-                alert("Password reset instructions will be sent to your registered Chamber email.");
-              }}
-              className="text-xs text-gray-300 hover:text-white transition"
+            <button
+              type="button"
+              ref={recoveryTrigger}
+              onClick={() => setRecoveryOpen(true)}
+              className="min-h-11 text-xs text-gray-300 hover:text-white transition underline underline-offset-4"
             >
               Forgot Password?
-            </a>
+            </button>
           </div>
 
           <button
@@ -362,87 +420,17 @@ export function LoginForm({
             )}
           </button>
 
-          {/* 1-Click Executive Access Button */}
-          <button
-            type="button"
-            onClick={() => {
-              setIsLoading(true);
-              setTimeout(() => {
-                setIsLoading(false);
-                setIsSuccess(true);
-                login();
-                setTimeout(() => {
-                  onSuccess?.();
-                  router.push("/dashboard");
-                }, 800);
-              }, 500);
-            }}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-linear-to-r from-amber-500/25 via-amber-400/35 to-yellow-500/25 border border-amber-400/50 hover:border-amber-300 text-amber-200 hover:text-white font-semibold text-xs tracking-wide transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] cursor-pointer shadow-sm shadow-amber-500/10"
-          >
-            <Sparkles className="w-4 h-4 text-amber-400" />
-            <span>1-Click Executive Demo Access</span>
-            <span className="text-[10px] bg-amber-400/30 text-amber-200 px-1.5 py-0.5 rounded font-mono">
-              DIRECT
-            </span>
-          </button>
-
-          {/* Divider */}
-          <div className="relative flex py-1 items-center">
-            <div className="flex-grow border-t border-gray-400/30"></div>
-            <span className="flex-shrink mx-4 text-gray-400 text-xs uppercase tracking-wider font-medium">
-              OR CONTINUE WITH
-            </span>
-            <div className="flex-grow border-t border-gray-400/30"></div>
-          </div>
-
-          {/* Google Login Button */}
-          <button
-            type="button"
-            onClick={() => {
-              setIsLoading(true);
-              setTimeout(() => {
-                setIsLoading(false);
-                setIsSuccess(true);
-                login("executive.delegate@vcci.org.in", "Executive Chamber Delegate");
-                setTimeout(() => {
-                  onSuccess?.();
-                  router.push("/dashboard");
-                }, 800);
-              }, 600);
-            }}
-            className="w-full flex items-center justify-center py-2.5 px-4 bg-white/90 hover:bg-white active:scale-[0.98] rounded-lg text-gray-700 font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-blue-500 transition-all duration-300 shadow-md hover:shadow-lg cursor-pointer"
-          >
-            <svg className="w-5 h-5 mr-2" viewBox="0 0 48 48">
-              <path
-                fill="#FFC107"
-                d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039L38.802 8.841C34.553 4.806 29.613 2.5 24 2.5C11.983 2.5 2.5 11.983 2.5 24s9.483 21.5 21.5 21.5S45.5 36.017 45.5 24c0-1.538-.135-3.022-.389-4.417z"
-              ></path>
-              <path
-                fill="#FF3D00"
-                d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12.5 24 12.5c3.059 0 5.842 1.154 7.961 3.039l5.839-5.841C34.553 4.806 29.613 2.5 24 2.5C16.318 2.5 9.642 6.723 6.306 14.691z"
-              ></path>
-              <path
-                fill="#4CAF50"
-                d="M24 45.5c5.613 0 10.553-2.306 14.802-6.341l-5.839-5.841C30.842 35.846 27.059 38 24 38c-5.039 0-9.345-2.608-11.124-6.481l-6.571 4.819C9.642 41.277 16.318 45.5 24 45.5z"
-              ></path>
-              <path
-                fill="#1976D2"
-                d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l5.839 5.841C44.196 35.123 45.5 29.837 45.5 24c0-1.538-.135-3.022-.389-4.417z"
-              ></path>
-            </svg>
-            Sign in with Google
-          </button>
         </form>
       )}
 
       <p className="text-center text-xs text-gray-400">
         Don&apos;t have an account?{" "}
-        <a
+        <Link
           href="/join"
           className="font-semibold text-blue-400 hover:text-blue-300 underline underline-offset-2 transition"
         >
           Sign Up / Apply for Membership
-        </a>
+        </Link>
       </p>
     </div>
   );

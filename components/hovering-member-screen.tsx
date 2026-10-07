@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import React, { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, MotionConfig } from "motion/react";
 import {
   X,
   Building2,
@@ -12,7 +12,6 @@ import {
   ArrowRight,
   Sparkles,
   CheckCircle2,
-  Lock,
 } from "lucide-react";
 import { SmokeyBackground, LoginForm } from "@/components/ui/login-form";
 import { useMemberModal } from "@/components/member-modal-context";
@@ -21,20 +20,41 @@ import Link from "next/link";
 
 export function HoveringMemberScreen() {
   const { isOpen, mode, closeModal, setMode, openModal, isLoggedIn, user, logout } = useMemberModal();
+  const dialog = useRef<HTMLDivElement>(null);
 
   // Handle escape key
   useEffect(() => {
+    if (!isOpen) return;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const frame = requestAnimationFrame(() => dialog.current?.focus());
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
+      if (e.key === "Escape") {
         closeModal();
+      } else if (e.key === "Tab" && dialog.current) {
+        const controls = Array.from(dialog.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]'))
+          .filter(element => element.getClientRects().length > 0 && !element.closest('[inert]'));
+        const first = controls[0];
+        const last = controls[controls.length - 1];
+        if (e.shiftKey && (document.activeElement === first || document.activeElement === dialog.current)) {
+          e.preventDefault(); last?.focus();
+        } else if (!e.shiftKey && (document.activeElement === last || document.activeElement === dialog.current)) {
+          e.preventDefault(); first?.focus();
+        }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+      previousFocus?.focus({ preventScroll: true });
+    };
   }, [isOpen, closeModal]);
 
   return (
-    <>
+    <MotionConfig reducedMotion="user">
       {/* Floating Pill on bottom-right of the screen */}
       <motion.div
         initial={{ opacity: 0, scale: 0.8, y: 20 }}
@@ -105,24 +125,28 @@ export function HoveringMemberScreen() {
 
             {/* Hovering Window Card with Attached Levitation Float */}
             <motion.div
+              ref={dialog}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Chamber member portal"
+              tabIndex={-1}
               initial={{ opacity: 0, scale: 0.9, y: 35 }}
               animate={{
                 opacity: 1,
                 scale: 1,
-                y: [0, -6, 0],
+                y: 0,
               }}
               exit={{ opacity: 0, scale: 0.92, y: 20 }}
               transition={{
                 opacity: { duration: 0.35 },
                 scale: { duration: 0.35, ease: [0.16, 1, 0.3, 1] },
                 y: {
-                  repeat: Infinity,
-                  duration: 5,
+                  duration: 0.35,
                   ease: "easeInOut",
                   times: [0, 0.5, 1],
                 },
               }}
-              className="relative w-full max-w-xl my-auto rounded-3xl border border-amber-400/35 shadow-[0_0_60px_rgba(217,119,6,0.18),0_30px_70px_-15px_rgba(0,0,0,0.85)] z-10"
+              className="relative w-full max-w-xl my-auto rounded-3xl bg-[#071B26] border border-amber-400/35 shadow-[0_0_60px_rgba(217,119,6,0.18),0_30px_70px_-15px_rgba(0,0,0,0.85)] z-10 outline-none"
               style={{ maxHeight: "calc(100vh - 2rem)" }}
             >
               {/* WebGL Smokey Background Canvas */}
@@ -145,7 +169,7 @@ export function HoveringMemberScreen() {
               {/* Glassmorphic UI Body */}
               <div className="relative z-10 p-5 sm:p-8 flex flex-col max-h-[calc(100vh-2.5rem)] overflow-y-auto">
                 {/* Header Strip with Emblem, Tabs & Close */}
-                <div className="flex items-center justify-between gap-3 pb-5 border-b border-white/10">
+                <div className="flex flex-wrap items-center justify-between gap-3 pb-5 border-b border-white/10">
                   <div className="flex items-center gap-2.5">
                     <img
                       src="/assets/a0ddb35059a90ffa27aaeeb64159c1aa.png"
@@ -265,14 +289,14 @@ export function HoveringMemberScreen() {
 
                       {/* CTAs */}
                       <div className="space-y-2.5">
-                        <a
+                        <Link
                           href="/dashboard"
                           onClick={closeModal}
                           className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-linear-to-r from-amber-500 via-amber-400 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-bold text-sm shadow-xl shadow-amber-500/25 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                         >
                           <span>Open Member Executive Dashboard</span>
                           <ArrowRight className="w-4 h-4" />
-                        </a>
+                        </Link>
 
                         <div className="flex items-center justify-between pt-2">
                           <button
@@ -284,13 +308,13 @@ export function HoveringMemberScreen() {
                           >
                             Sign Out of Chamber Session
                           </button>
-                          <a
+                          <Link
                             href="/dashboard#hotels"
                             onClick={closeModal}
                             className="text-xs text-amber-300 hover:text-amber-200 transition"
                           >
                             Browse Hotel Tariffs ↗
-                          </a>
+                          </Link>
                         </div>
                       </div>
                     </div>
@@ -302,7 +326,6 @@ export function HoveringMemberScreen() {
                         title="Member Sign In"
                         subtitle="Access the VCCI Executive Chamber Portal"
                         className="bg-transparent border-none shadow-none p-0 max-w-full"
-                        onClose={closeModal}
                       />
                     </div>
                   )}
@@ -312,7 +335,7 @@ export function HoveringMemberScreen() {
           </div>
         )}
       </AnimatePresence>
-    </>
+    </MotionConfig>
   );
 }
 
@@ -400,7 +423,7 @@ function JoinMembershipForm({
             />
             <label
               htmlFor="join_company"
-              className="absolute text-sm text-gray-300 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-amber-300 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+              className="absolute text-sm text-gray-300 duration-300 transform -translate-y-6 scale-75 top-3 z-10 pointer-events-none origin-[0] peer-focus:left-0 peer-focus:text-amber-300 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
             >
               <Building2 className="inline-block mr-2 -mt-1" size={15} />
               Company / Organisation *
@@ -422,7 +445,7 @@ function JoinMembershipForm({
             />
             <label
               htmlFor="join_name"
-              className="absolute text-sm text-gray-300 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-amber-300 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+              className="absolute text-sm text-gray-300 duration-300 transform -translate-y-6 scale-75 top-3 z-10 pointer-events-none origin-[0] peer-focus:left-0 peer-focus:text-amber-300 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
             >
               <User className="inline-block mr-2 -mt-1" size={15} />
               Full Name *
@@ -446,7 +469,7 @@ function JoinMembershipForm({
             />
             <label
               htmlFor="join_email"
-              className="absolute text-sm text-gray-300 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-amber-300 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+              className="absolute text-sm text-gray-300 duration-300 transform -translate-y-6 scale-75 top-3 z-10 pointer-events-none origin-[0] peer-focus:left-0 peer-focus:text-amber-300 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
             >
               <Mail className="inline-block mr-2 -mt-1" size={15} />
               Work Email Address *
@@ -468,7 +491,7 @@ function JoinMembershipForm({
             />
             <label
               htmlFor="join_phone"
-              className="absolute text-sm text-gray-300 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-amber-300 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+              className="absolute text-sm text-gray-300 duration-300 transform -translate-y-6 scale-75 top-3 z-10 pointer-events-none origin-[0] peer-focus:left-0 peer-focus:text-amber-300 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
             >
               <Phone className="inline-block mr-2 -mt-1" size={15} />
               Phone / Mobile *

@@ -1,9 +1,5 @@
-import WorksWheelDemo from "@/components/ui/demo";
-
-export const metadata = {
-  title: "Works Wheel Demo | Vizag Chamber",
-};
+import { redirect } from "next/navigation";
 
 export default function DemoPage() {
-  return <WorksWheelDemo />;
+  redirect("/login");
 }

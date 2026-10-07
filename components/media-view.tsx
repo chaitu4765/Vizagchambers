@@ -231,7 +231,7 @@ export function MediaView() {
               </h3>
             </div>
             <span className="text-xs text-muted-foreground font-mono">
-              Scroll or Drag • Arrow Keys ↑ ↓
+              Drag or use arrows • Shift + Scroll
             </span>
           </div>
 

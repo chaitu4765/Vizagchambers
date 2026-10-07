@@ -112,6 +112,9 @@ export function WorksWheel({
   const cardRefs = React.useRef<(HTMLElement | null)[]>([]);
   const labelRef = React.useRef<HTMLDivElement>(null);
   const titleRef = React.useRef<HTMLDivElement>(null);
+  const uid = React.useId();
+  const wake = React.useRef<() => void>(() => {});
+  const activeRef = React.useRef(0);
 
   // The wheel's position, and where it is heading. Only `active` is state -
   // everything else is written to the DOM, so turning the wheel is not a render.
@@ -173,10 +176,12 @@ export function WorksWheel({
   React.useEffect(() => {
     if (!stage.h) return;
     let frame = 0;
+    let visible = false;
+    let disposed = false;
     const { ringR, ringScale, drumR, bow } = metrics;
 
     const draw = () => {
-      frame = requestAnimationFrame(draw);
+      frame = 0;
       const gap = target.current - turn.current;
       if (Math.abs(gap) < 0.0005) turn.current = target.current;
       else turn.current += gap * (reduced ? 1 : EASE);
@@ -209,6 +214,7 @@ export function WorksWheel({
           // back round to face us, and everything past the neighbours lands on
           // the vanishing point in a heap.
           card.style.opacity = m > 0.5 && Math.abs(d) > CULL ? "0" : "1";
+          card.style.pointerEvents = m > 0.5 && Math.abs(d) > CULL ? "none" : "auto";
           card.style.zIndex = String(Math.round(100 - Math.abs(d) * 2));
         }
         const face = card?.firstElementChild as HTMLElement | null;
@@ -218,16 +224,41 @@ export function WorksWheel({
       if (labelRef.current) labelRef.current.style.opacity = String(1 - m);
       if (titleRef.current) titleRef.current.style.opacity = String(m);
       const near = clamp(Math.round(pos), 0, last);
-      setActive((prev) => (prev === near ? prev : near));
+      if (near !== activeRef.current) {
+        activeRef.current = near;
+        setActive(near);
+      }
+      if (Math.abs(target.current - turn.current) >= 0.0005) schedule();
     };
 
-    frame = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(frame);
+    const schedule = () => {
+      if (!disposed && visible && !document.hidden && !frame) frame = requestAnimationFrame(draw);
+    };
+    const visibility = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible) schedule();
+      else { cancelAnimationFrame(frame); frame = 0; }
+    });
+    visibility.observe(stageRef.current!);
+    const onVisibilityChange = () => {
+      if (document.hidden) { cancelAnimationFrame(frame); frame = 0; }
+      else schedule();
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    wake.current = schedule;
+    return () => {
+      disposed = true;
+      cancelAnimationFrame(frame);
+      visibility.disconnect();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      wake.current = () => {};
+    };
   }, [metrics, stage.h, count, last, reduced]);
 
   const to = React.useCallback(
     (next: number) => {
       target.current = clamp(next, 0, last + 1);
+      wake.current();
     },
     [last],
   );
@@ -240,6 +271,8 @@ export function WorksWheel({
     const el = stageRef.current;
     if (!el) return;
     const onWheel = (event: WheelEvent) => {
+      // Page scrolling always wins unless the user explicitly holds Shift.
+      if (!event.shiftKey || event.ctrlKey || reduced) return;
       const next = target.current + event.deltaY / WHEEL_UNITS;
       if (next > 0 && next < last + 1) event.preventDefault();
       to(next);
@@ -258,9 +291,9 @@ export function WorksWheel({
       el.removeEventListener("wheel", onWheel);
       window.clearTimeout(settling.current);
     };
-  }, [to, last]);
+  }, [to, last, reduced]);
 
-  const drag = React.useRef<number | null>(null);
+  const drag = React.useRef<{ position: number; touch: boolean } | null>(null);
 
   return (
     <section
@@ -276,26 +309,37 @@ export function WorksWheel({
         tabIndex={0}
         role="listbox"
         aria-label={label}
-        aria-activedescendant={`works-wheel-${active}`}
-        className="focus-visible:outline-foreground absolute inset-0 cursor-grab touch-pan-x outline-none focus-visible:outline-2 focus-visible:-outline-offset-4 active:cursor-grabbing"
+        aria-activedescendant={count ? `${uid}-option-${active}` : undefined}
+        aria-describedby={`${uid}-instructions`}
+        className="focus-visible:outline-foreground absolute inset-0 cursor-grab touch-pan-y outline-none focus-visible:outline-2 focus-visible:-outline-offset-4 active:cursor-grabbing"
         style={{ perspective: `${metrics.depth}px` }}
         onPointerDown={(event) => {
-          drag.current = event.clientY;
+          if (event.button !== 0) return;
+          event.currentTarget.focus({ preventScroll: true });
+          const touch = event.pointerType === "touch";
+          drag.current = { position: touch ? event.clientX : event.clientY, touch };
           event.currentTarget.setPointerCapture(event.pointerId);
         }}
         onPointerMove={(event) => {
           if (drag.current === null) return;
-          to(target.current + (drag.current - event.clientY) / DRAG_UNITS);
-          drag.current = event.clientY;
+          const position = drag.current.touch ? event.clientX : event.clientY;
+          to(target.current + (drag.current.position - position) / DRAG_UNITS);
+          drag.current.position = position;
         }}
         onPointerUp={() => {
           // Land on an item rather than between two.
           drag.current = null;
           if (target.current > 1) to(Math.round(target.current));
         }}
+        onPointerCancel={() => { drag.current = null; to(Math.round(target.current)); }}
         onKeyDown={(event) => {
-          if (event.key === "ArrowDown") to(Math.round(target.current) + 1);
-          else if (event.key === "ArrowUp") to(Math.round(target.current) - 1);
+          if (event.target !== event.currentTarget) return;
+          if (event.key === "ArrowDown") to(Math.max(1, Math.round(target.current)) + 1);
+          else if (event.key === "ArrowUp") to(Math.max(1, Math.round(target.current) - 1));
+          else if (event.key === "Home") to(1);
+          else if (event.key === "End") to(last + 1);
+          else if (event.key === "Enter" && items[active]?.href) cardRefs.current[active]?.click();
+          else if (event.key === "Escape") event.currentTarget.blur();
           else return;
           event.preventDefault();
         }}
@@ -309,10 +353,11 @@ export function WorksWheel({
             return (
               <React.Fragment key={item.title}>
                 <Tag
-                  id={`works-wheel-${i}`}
+                  id={`${uid}-option-${i}`}
                   role="option"
                   aria-selected={i === active}
                   href={item.href}
+                  tabIndex={-1}
                   ref={(node: HTMLElement | null) => {
                     cardRefs.current[i] = node;
                   }}
@@ -329,6 +374,8 @@ export function WorksWheel({
                       src={item.image}
                       alt={item.title}
                       draggable={false}
+                      loading="lazy"
+                      decoding="async"
                       className="size-full object-cover"
                     />
                     {action && item.href ? (
@@ -370,15 +417,15 @@ export function WorksWheel({
       </div>
       <div
         ref={titleRef}
-        className="pointer-events-none absolute top-1/2 left-[8%] -translate-y-1/2 tracking-tight opacity-0 font-serif max-w-sm"
+        className="pointer-events-none absolute top-16 left-4 right-4 text-center tracking-tight opacity-0 font-serif md:top-1/2 md:left-[3%] md:right-auto md:max-w-[24%] md:-translate-y-1/2"
         style={{ fontSize: metrics.title }}
       >
         {items[active]?.title}
       </div>
 
       <ol
-        className="text-muted-foreground absolute top-[7.5%] right-[2.5%] text-right leading-[1.75] max-h-[85%] overflow-y-auto no-scrollbar"
-        style={{ fontSize: metrics.index }}
+        className="text-muted-foreground absolute top-[7.5%] right-[2.5%] hidden md:block text-right leading-[1.75] max-w-[25%] max-h-[70%] overflow-y-auto"
+        style={{ fontSize: Math.max(12, metrics.index) }}
       >
         {items.map((item, i) => (
           <li key={item.title}>
@@ -395,6 +442,12 @@ export function WorksWheel({
           </li>
         ))}
       </ol>
+      <div className="absolute inset-x-4 bottom-4 flex flex-wrap items-center justify-center gap-3">
+        <button type="button" onClick={() => to(Math.max(1, Math.round(target.current) - 1))} disabled={!count || active === 0} className="min-h-11 rounded-full border border-border bg-background px-4 text-sm disabled:opacity-40">Previous</button>
+        <span className="text-sm" aria-live="polite">{count ? active + 1 : 0} / {count}</span>
+        <button type="button" onClick={() => to(Math.max(1, Math.round(target.current)) + 1)} disabled={!count || active === last} className="min-h-11 rounded-full border border-border bg-background px-4 text-sm disabled:opacity-40">Next</button>
+        <p id={`${uid}-instructions`} className="w-full text-center text-xs text-muted-foreground">Use arrow keys, Home / End, or drag. Hold Shift to scroll through items. Enter opens the selected item.</p>
+      </div>
     </section>
   );
 }

@@ -5,8 +5,10 @@ import React, {
   useContext,
   useState,
   useEffect,
+  useCallback,
   type ReactNode,
 } from "react";
+import { MotionConfig } from "motion/react";
 
 export type MemberModalMode = "join" | "login";
 
@@ -23,17 +25,8 @@ export interface MemberUser {
   rsvps?: string[];
 }
 
-export const DEFAULT_MEMBER: MemberUser = {
-  name: "Sri K. Ramakrishna Rao",
-  company: "Coromandel Marine & Logistics Solutions",
-  membershipLevel: "Corporate Member",
-  memberId: "VCCI-CORP-2026-084",
-  email: "kr.rao@coromandelmarine.com",
-  phone: "+91 98481 22340",
-  validThru: "31 March 2027",
-  category: "Shipping & Maritime Logistics",
-  rsvps: ["vcci-summit-2026", "ap-msme-linkage-2026"],
-};
+const SESSION_VERSION = 2;
+const savedSession = (user: MemberUser) => JSON.stringify({ version: SESSION_VERSION, user });
 
 interface MemberModalContextValue {
   isOpen: boolean;
@@ -43,7 +36,7 @@ interface MemberModalContextValue {
   openModal: (mode?: MemberModalMode) => void;
   closeModal: () => void;
   setMode: (mode: MemberModalMode) => void;
-  login: (email?: string, name?: string) => void;
+  login: (email: string, name: string) => void;
   logout: () => void;
   toggleRsvp: (eventId: string) => void;
 }
@@ -86,31 +79,44 @@ export function MemberModalProvider({
   const [mode, setMode] = useState<MemberModalMode>(defaultMode);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<MemberUser | null>(null);
+  const closeModal = useCallback(() => setIsOpen(false), []);
 
   // Restore session from localStorage on mount
   useEffect(() => {
-    try {
+    // Defer the browser-only restore until after the initial hydration frame.
+    const frame = requestAnimationFrame(() => { try {
       const saved = localStorage.getItem("vcci_member_session");
       if (saved) {
         const parsed = JSON.parse(saved);
-        setUser(parsed);
-        setIsLoggedIn(true);
+        // Old sessions contain a seeded demo identity and must not be restored.
+        if (parsed.version === SESSION_VERSION && typeof parsed.user?.name === "string" && parsed.user.name.trim() && typeof parsed.user?.email === "string" && parsed.user.email.trim()) {
+          setUser(parsed.user);
+          setIsLoggedIn(true);
+        }
       }
     } catch {
       // Ignore localStorage errors
-    }
+    } });
+    return () => cancelAnimationFrame(frame);
   }, []);
 
-  const login = (email?: string, name?: string) => {
+  const login = (email: string, name: string) => {
+    if (!email.trim() || !name.trim()) return;
     const updatedUser: MemberUser = {
-      ...DEFAULT_MEMBER,
-      email: email || DEFAULT_MEMBER.email,
-      name: name || DEFAULT_MEMBER.name,
+      email: email.trim().toLowerCase(),
+      name: name.trim(),
+      company: "",
+      membershipLevel: "Member portal",
+      memberId: "Pending verification",
+      phone: "",
+      validThru: "Pending verification",
+      category: "",
+      rsvps: [],
     };
     setUser(updatedUser);
     setIsLoggedIn(true);
     try {
-      localStorage.setItem("vcci_member_session", JSON.stringify(updatedUser));
+      localStorage.setItem("vcci_member_session", savedSession(updatedUser));
     } catch {
       // Ignore storage errors
     }
@@ -136,7 +142,7 @@ export function MemberModalProvider({
     const updated = { ...user, rsvps: next };
     setUser(updated);
     try {
-      localStorage.setItem("vcci_member_session", JSON.stringify(updated));
+      localStorage.setItem("vcci_member_session", savedSession(updated));
     } catch {
       // Ignore storage errors
     }
@@ -162,6 +168,7 @@ export function MemberModalProvider({
     const handleLinkClick = (e: MouseEvent) => {
       const target = (e.target as Element).closest<HTMLAnchorElement>("a");
       if (!target) return;
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || target.target === "_blank" || target.hasAttribute("download")) return;
       const href = target.getAttribute("href");
       if (!href) return;
 
@@ -188,7 +195,7 @@ export function MemberModalProvider({
   }, [isLoggedIn]);
 
   return (
-    <MemberModalContext.Provider
+    <MotionConfig reducedMotion="user"><MemberModalContext.Provider
       value={{
         isOpen,
         mode,
@@ -198,7 +205,7 @@ export function MemberModalProvider({
           setMode(m);
           setIsOpen(true);
         },
-        closeModal: () => setIsOpen(false),
+        closeModal,
         setMode,
         login,
         logout,
@@ -206,6 +213,6 @@ export function MemberModalProvider({
       }}
     >
       {children}
-    </MemberModalContext.Provider>
+    </MemberModalContext.Provider></MotionConfig>
   );
 }

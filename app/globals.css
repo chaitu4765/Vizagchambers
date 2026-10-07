@@ -51,6 +51,7 @@
   --color-ring: var(--ring);
   --radius-lg: var(--radius);
 }
+@layer base {
 * {
   box-sizing: border-box;
 }
@@ -96,6 +97,7 @@ img {
 ::selection {
   background: #d6b77d;
   color: #082432;
+}
 }
 .site-header {
   height: 104px;
@@ -391,6 +393,7 @@ h2 em {
   color: #7d826b;
   margin-bottom: 18px;
 }
+@layer base {
 h2 {
   font-family: "Manrope", sans-serif;
   font-size: clamp(36px, 3.5vw, 55px);
@@ -398,6 +401,7 @@ h2 {
   font-weight: 500;
   letter-spacing: -0.045em;
   margin: 0;
+}
 }
 h2 em {
   color: #7b897c;

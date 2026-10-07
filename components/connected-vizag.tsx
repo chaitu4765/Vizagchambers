@@ -1,28 +1,16 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
+import { useReducedMotion } from "motion/react";
 import {
-  motion,
   useScroll,
-  useTransform,
   useSpring,
   useMotionValueEvent,
 } from "@/components/ui/hero-01-utils/motion";
 import {
-  Anchor,
-  Factory,
-  Cpu,
-  FlaskConical,
-  Building2,
-  FileCheck2,
-  Headphones,
-  Users,
-  Sparkles,
   ArrowUpRight,
   ArrowDown,
-  CheckCircle2,
   ShieldCheck,
-  ChevronRight,
 } from "lucide-react";
 
 // ============================================================================
@@ -719,17 +707,8 @@ function ConnectedVizagIllustration({
 export function ConnectedVizag() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeStage, setActiveStage] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [reducedMotion, setReducedMotion] = useState(false);
-
-  // Check prefers-reduced-motion
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReducedMotion(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
+  const activeStageRef = useRef(0);
+  const reducedMotion = useReducedMotion() ?? true;
 
   // Motion scroll hook
   const { scrollYProgress } = useScroll({
@@ -746,14 +725,14 @@ export function ConnectedVizag() {
 
   // Synchronize state with scroll without re-rendering entire page continuously
   useMotionValueEvent(smoothProgress, "change", (latest) => {
-    setScrollProgress(latest);
     let stage = 0;
     if (latest >= 0.72) stage = 3;
     else if (latest >= 0.46) stage = 2;
     else if (latest >= 0.20) stage = 1;
     else stage = 0;
 
-    if (stage !== activeStage) {
+    if (stage !== activeStageRef.current) {
+      activeStageRef.current = stage;
       setActiveStage(stage);
     }
   });
@@ -974,7 +953,7 @@ export function ConnectedVizag() {
               {/* RIGHT COLUMN: The Evolving Stylised SVG Illustration */}
               <div className="col-span-7 flex items-center justify-center">
                 <ConnectedVizagIllustration
-                  progress={scrollProgress}
+                  progress={activeStage / 3}
                   activeStage={activeStage}
                   reducedMotion={reducedMotion}
                 />

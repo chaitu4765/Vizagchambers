@@ -286,7 +286,7 @@ const PARTNER_HOTELS: HotelPartner[] = [
 ];
 
 export function MemberDashboardView() {
-  const { user, isLoggedIn, login, logout, toggleRsvp, openModal } = useMemberModal();
+  const { user, isLoggedIn, logout, toggleRsvp, openModal } = useMemberModal();
   const [activeTab, setActiveTab] = useState("events");
   const [eventFilter, setEventFilter] = useState<string>("ALL");
   const [hotelFilter, setHotelFilter] = useState<string>("ALL");
@@ -294,7 +294,6 @@ export function MemberDashboardView() {
   const [selectedHotel, setSelectedHotel] = useState<HotelPartner | null>(null);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [icsDownloaded, setIcsDownloaded] = useState<string | null>(null);
-  const [ticketVariant, setTicketVariant] = useState<"crimson" | "paper">("crimson");
 
   // If user is not logged in, show an inviting login prompt card
   if (!isLoggedIn || !user) {
@@ -326,7 +325,7 @@ export function MemberDashboardView() {
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
               <button
                 type="button"
-                onClick={() => login()}
+                onClick={() => openModal("login")}
                 style={{
                   background: "linear-gradient(135deg, #F59E0B 0%, #FBBF24 50%, #D97706 100%)",
                   color: "#071B26",
@@ -334,16 +333,9 @@ export function MemberDashboardView() {
                 }}
                 className="w-full sm:w-auto px-6 py-3.5 rounded-xl font-bold text-sm tracking-wide transition-all duration-300 hover:scale-105 cursor-pointer"
               >
-                1-Click Sign In as Executive Member
+                Member Sign In
               </button>
 
-              <button
-                type="button"
-                onClick={() => openModal("login")}
-                className="w-full sm:w-auto px-6 py-3.5 rounded-xl font-semibold text-sm text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-all cursor-pointer"
-              >
-                Open Member Sign In Modal
-              </button>
             </div>
           </div>
         </div>
@@ -423,41 +415,16 @@ END:VCALENDAR`;
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
                   <BadgeCheck size={11} />
-                  <span>Validated {user.validThru}</span>
+                  <span>Membership details pending confirmation</span>
                 </span>
               </div>
               <p className="text-xs text-muted-foreground mt-0.5">
-                {user.company} • <span className="font-mono text-amber-600 dark:text-amber-400">ID: {user.memberId}</span>
+                {user.email}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 flex-wrap sm:shrink-0">
-            {/* Ticket style toggle */}
-            <div className="inline-flex rounded-xl bg-muted p-1 border border-border/70 text-xs">
-              <button
-                type="button"
-                onClick={() => setTicketVariant("crimson")}
-                className={`px-3 py-1 rounded-lg font-medium transition cursor-pointer ${
-                  ticketVariant === "crimson"
-                    ? "bg-slate-900 text-amber-300 shadow-xs font-semibold"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Crimson Plate
-              </button>
-              <button
-                type="button"
-                onClick={() => setTicketVariant("paper")}
-                className={`px-3 py-1 rounded-lg font-medium transition cursor-pointer ${
-                  ticketVariant === "paper"
-                    ? "bg-background text-foreground shadow-xs font-semibold"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Paper Print
-              </button>
-            </div>
 
             <button
               onClick={() => setActiveTab("card")}
@@ -481,16 +448,16 @@ END:VCALENDAR`;
         <div className="flex justify-center w-full overflow-hidden py-2">
           <EngravedTicket
             word="VCCI"
-            variant={ticketVariant}
+            variant="crimson"
             tagline={`VIZAGAPATAM CHAMBER\nESTD. 1931`}
             quote={`“${user.name}”`}
-            body={`This certifies that ${user.company} is an accredited ${user.membershipLevel} in good standing with the Visakhapatnam Chamber of Commerce & Industry (Member ID: ${user.memberId}). Valid through ${user.validThru}. Entitled to statutory export certification, partner hotel concessions, and executive summit representation.`}
+            body={`Member portal pass for ${user.name}. Registered email: ${user.email}. Membership status and benefits are confirmed separately by the Chamber secretariat.`}
             notes={`Admit Member\n${user.memberId}\n${user.membershipLevel}\nWaltair Uplands\nVisakhapatnam`}
             code={user.memberId}
             dot={2}
             width="min(100%, 1160px)"
             tilt={8}
-            accent={ticketVariant === "crimson" ? "#F59E0B" : "#d9241c"}
+            accent="#F59E0B"
           />
         </div>
 
@@ -972,12 +939,13 @@ END:VCALENDAR`;
                 title="VIZAG CHAMBER"
                 subtitle="Executive Pass · Est. 1931 · Visakhapatnam"
                 name={user.name}
-                role={`${user.membershipLevel} · ${user.company}`}
+                role={user.email}
                 strapText="vizagapatam chamber of commerce & industry"
                 strapLabel={`MEMBER ${user.memberId}`}
                 strapColor="#071B26"
                 inkColor="#F59E0B"
                 cardColor="#0B2633"
+                textColor="#FFFFFF"
                 height="560px"
                 cardWidth={260}
                 flipButton={true}

@@ -97,11 +97,7 @@ export default function GlyphPortal({
   const progressRef = useRef(onProgress);
   useLayoutEffect(() => { progressRef.current = onProgress; }, [onProgress]);
   const text = word.trim().normalize("NFC") || "SUBLIME";
-  let characterOffset = 0;
-  const characters = Array.from(text, (char) => {
-    const index = characterOffset; characterOffset += char.length;
-    return { char, index };
-  });
+  const characters = Array.from(text).map((char, i, chars) => ({ char, index: chars.slice(0, i).join("").length }));
   const length = Number.isFinite(scrollLength) ? clamp(scrollLength, 1, 8) : 2.4;
   const weight = Number.isFinite(fontWeight) ? clamp(fontWeight, 1, 1000) : 900;
   const hasFront = front != null;
@@ -120,11 +116,10 @@ export default function GlyphPortal({
     const picker = section.querySelector("[data-gp-select]") as unknown as HTMLSelectElement;
     const root = scrollParent(section);
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const roomy = window.matchMedia("(min-width: 768px) and (min-height: 600px)");
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d", { willReadFrequently: true });
     let disposed = false, raf = 0, dirty = true, active = true, ready = false;
-    const mountedAt = performance.now();
-    let browserFrameSeen = true, stalled = false;
     let W = 1, H = 1, travel = 1, startScale = 1, endScale = 1;
     let center = { x: 0, y: 0 }, target: Ink | null = null;
     let lastProgress = -1;
@@ -133,7 +128,6 @@ export default function GlyphPortal({
     let bounds = { x: 0, y: 0, width: 1, height: 1 };
     let fontDirty = true;
     glyph.style.fontFamily = fontFamily;
-    stalled = false;
 
     const readInk = () => {
       if (!context) return false;
@@ -231,6 +225,17 @@ export default function GlyphPortal({
 
     const layout = () => {
       if (!section.clientWidth) return;
+      // Small screens and reduced-motion users read in normal document flow.
+      // Skip the font raster scan and the sticky camera entirely in that mode.
+      if (motion.matches || !roomy.matches || !context) {
+        ready = false;
+        section.dataset.gpMotion = "off";
+        section.dataset.gpChoosing = "false";
+        choices.inert = true;
+        section.style.setProperty("--gp-reveal", "1");
+        field.style.clipPath = "none";
+        return;
+      }
       W = pin.clientWidth;
       // A 100svh probe keeps browser chrome from continually changing the scroll distance.
       const smallViewport = section.querySelector<HTMLElement>("[data-gp-viewport]")!.offsetHeight;
@@ -240,7 +245,7 @@ export default function GlyphPortal({
       travel = H * Math.max(0.5, length - 1);
       art.setAttribute("viewBox", `0 0 ${W} ${H}`);
       if (fontDirty) { ready = readInk(); fontDirty = false; }
-      if (!ready) return;
+      if (!ready) { section.dataset.gpMotion = "off"; return; }
       const wordHeight = hasFront && H < 480 ? Math.min(H * .38, Math.max(24, H - 264)) : H * .38;
       startScale = Math.min(W * 0.84 / bounds.width, wordHeight / bounds.height);
       // The whole viewport fits inside measured ink, even with the small camera bank.
@@ -261,17 +266,14 @@ export default function GlyphPortal({
 
     };
 
-    const frame = (time?: number) => {
+    const frame = () => {
       raf = 0;
       if (disposed) return;
-      if (time !== undefined && !browserFrameSeen) {
-        browserFrameSeen = true; dirty = true;
-      }
       if (dirty) { dirty = false; layout(); }
       if (ready) paint(position());
     };
     const schedule = () => { if (!raf && active) raf = requestAnimationFrame(frame); };
-    const resize = () => { cancelAnimationFrame(raf); dirty = true; frame(); };
+    const resize = () => { dirty = true; schedule(); };
     const scroll = () => schedule();
     const choose = (event: Event) => {
       if (!choosing || position() >= .04) return;
@@ -299,7 +301,7 @@ export default function GlyphPortal({
     choices.addEventListener("keydown", navigate);
     picker.addEventListener("change", pick);
     const observer = new ResizeObserver(resize);
-    observer.observe(section);
+    observer.observe(pin);
     if (root) observer.observe(root);
     const visibility = new IntersectionObserver(([entry]) => {
       active = entry.isIntersecting;
@@ -311,6 +313,8 @@ export default function GlyphPortal({
     window.addEventListener("resize", resize);
     window.visualViewport?.addEventListener("resize", resize);
     motion.addEventListener("change", resize);
+    roomy.addEventListener("change", resize);
+    document.fonts.ready.then(() => { if (!disposed) { fontDirty = true; resize(); } });
     frame();
     // WebKit can withhold frames, timers and scroll events behind an initial hung font.
     // Begin in reading flow. Enable motion only when the browser starts rendering promptly.
@@ -324,6 +328,7 @@ export default function GlyphPortal({
       window.removeEventListener("resize", resize);
       window.visualViewport?.removeEventListener("resize", resize);
       motion.removeEventListener("change", resize);
+      roomy.removeEventListener("change", resize);
       choices.removeEventListener("pointerover", choose);
       choices.removeEventListener("click", choose);
       choices.removeEventListener("focusin", choose);
@@ -338,7 +343,7 @@ export default function GlyphPortal({
       <style>{`
         ${q}{--gp-paper:#fff;--gp-ink:#0c1212;--gp-field:#0b3b2a;--gp-foreground:#fbfbfa;position:relative;isolation:isolate;background:var(--gp-paper);color:var(--gp-ink);font-family:Arial,sans-serif;}
         ${q}>[data-gp-viewport]{position:absolute;inset:0 auto auto 0;height:100vh;height:100svh;width:0;pointer-events:none;visibility:hidden;}
-        ${q} [data-gp-pin]{position:relative;height:var(--gp-height,100svh);overflow:clip;isolation:isolate;container-type:size;}
+        ${q} [data-gp-pin]{position:relative;overflow:clip;isolation:isolate;}
         ${q} [data-gp-field]{position:absolute;inset:0;background:var(--gp-field);opacity:0;pointer-events:none;}
         ${q}[data-gp-ready] [data-gp-field]{opacity:1;}
         ${q} [data-gp-art]{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;}
@@ -368,9 +373,10 @@ export default function GlyphPortal({
         ${q}[data-gp-motion=on]{height:calc(var(--gp-length) * var(--gp-height, 100svh));position:relative;}
         ${q}[data-gp-motion=on] [data-gp-pin]{position:sticky;top:0;height:var(--gp-height,100svh);overflow:clip;}
         ${q}[data-gp-motion=off] [data-gp-hint]{display:none;}
+        ${q}:not([data-gp-motion=on]) [data-gp-front],${q}:not([data-gp-motion=on]) [data-gp-caption],${q}:not([data-gp-motion=on]) [data-gp-art],${q}:not([data-gp-motion=on]) [data-gp-field]{display:none;}
         ${q}[data-gp-motion=on] [data-gp-content]{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:20;padding:clamp(16px,3.5vw,40px);opacity:var(--gp-reveal,0);transform:translateY(calc((1 - var(--gp-reveal, 0)) * 24px)) scale(calc(0.96 + 0.04 * var(--gp-reveal, 0)));transition:opacity 0.12s ease-out,transform 0.12s ease-out;pointer-events:var(--gp-content-hit,none);overflow-y:auto;}
         ${q}[data-gp-motion=off] [data-gp-pin]{position:relative;height:auto;}
-        ${q}[data-gp-motion=off] [data-gp-content]{position:relative;display:flex;align-items:center;justify-content:center;opacity:1;pointer-events:auto;background:var(--gp-field);padding:48px 24px;}
+        ${q}:not([data-gp-motion=on]) [data-gp-content]{position:relative;display:flex;align-items:center;justify-content:center;opacity:1;pointer-events:auto;background:var(--gp-field);color:var(--gp-foreground);padding:48px 16px;}
         ${q}[data-gp-motion=on]:has([data-gp-content]:focus-within) [data-gp-field]{clip-path:none!important;}
         ${q}[data-gp-motion=on] [data-gp-content]:focus-within{opacity:1;pointer-events:auto;}
         ${q}:has([data-gp-content]:focus-within) [data-gp-caption],${q}:has([data-gp-content]:focus-within) [data-gp-marks]{opacity:0;}

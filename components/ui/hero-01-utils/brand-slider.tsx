@@ -102,7 +102,8 @@ export default function BrandSlider({ brandList }: { brandList?: BrandList[] }) 
                       item.image ||
                       "/assets/a0ddb35059a90ffa27aaeeb64159c1aa.png"
                     }
-                    alt={item.name}
+                    alt=""
+                    loading="lazy"
                     className="w-7 h-7 object-contain shrink-0 group-hover:scale-110 transition-transform"
                   />
                   <div className="flex flex-col text-left">

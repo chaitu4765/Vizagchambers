@@ -41,6 +41,8 @@ export interface LanyardBadgeProps {
   inkColor?: string
   /** Built-in card stock colour. */
   cardColor?: string
+  /** Text colour for the built-in faces, independent of decorative strap ink. */
+  textColor?: string
   /** Show the "Show back / Show front" button in the top corner. */
   flipButton?: boolean
   /** Card width in px. Height follows at 3:2, strap width at a tenth. */
@@ -265,6 +267,7 @@ export default function LanyardBadge({
   strapColor = "#141312",
   inkColor = "#b59a6c",
   cardColor = "#e8dfcc",
+  textColor,
   flipButton = true,
   cardWidth = 240,
   height = "100svh",
@@ -283,6 +286,9 @@ export default function LanyardBadge({
   backRef.current = showBack
 
   const cw = cardWidth
+  const channels = /^#[0-9a-f]{6}$/i.test(cardColor) ? [1, 3, 5].map(i => parseInt(cardColor.slice(i, i + 2), 16) / 255) : [1, 1, 1]
+  const luminance = channels.map(c => c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4).reduce((sum, c, i) => sum + c * [.2126, .7152, .0722][i], 0)
+  const foreground = textColor ?? (luminance < .179 ? "#FFFFFF" : "#111111")
   const ch = Math.round(cardWidth * 1.5)
   const ringR = Math.max(7, Math.round(cw * 0.036))
   const clipH = Math.round(cw * 0.1)
@@ -624,11 +630,11 @@ export default function LanyardBadge({
       <Ornament className="absolute" style={{ width: 300 * s, right: -130 * s, top: 100 * s, maxWidth: "none" }} />
       <Ornament className="absolute" style={{ width: 210 * s, left: -40 * s, bottom: -70 * s, maxWidth: "none", opacity: 0.8 }} />
       <Arrow className="absolute" style={{ width: 14 * s, height: 250 * s, left: 26 * s, top: 110 * s, transform: "rotate(-14deg)", maxWidth: "none" }} />
-      <div className="absolute" style={{ left: 22 * s, top: 34 * s, right: 22 * s }}>
+      <div className="absolute" style={{ left: 22 * s, top: 34 * s, right: 22 * s, color: foreground, background: cardColor, padding: 8 * s, borderRadius: 8 * s }}>
         <div style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 25 * s, lineHeight: 1, textTransform: "uppercase", letterSpacing: "0.01em" }}>
           {title}
         </div>
-        <div style={{ fontSize: 6.5 * s, marginTop: 6 * s, letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.85 }}>
+        <div style={{ fontSize: 12 * s, marginTop: 8 * s, lineHeight: 1.5, overflowWrap: "anywhere" }}>
           {subtitle}
         </div>
       </div>
@@ -637,11 +643,11 @@ export default function LanyardBadge({
   const defaultBack = (
     <div className="relative h-full w-full" style={{ background: cardColor }}>
       <Ornament className="absolute" style={{ width: 150 * s, right: -30 * s, top: 30 * s, color: inkColor, opacity: 0.6, maxWidth: "none" }} />
-      <div className="absolute" style={{ left: 22 * s, top: 70 * s, color: strapColor }}>
+      <div className="absolute" style={{ left: 16 * s, right: 16 * s, top: 54 * s, color: foreground, background: cardColor, padding: 12 * s, borderRadius: 8 * s, zIndex: 1 }}>
         <Ornament style={{ width: 26 * s, color: inkColor }} />
-        <div style={{ width: 16 * s, height: 2 * s, background: strapColor, margin: (14 * s) + "px 0 " + (8 * s) + "px" }} />
-        <div style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 17 * s, lineHeight: 1.05, textTransform: "uppercase" }}>{name}</div>
-        <div style={{ fontSize: 7 * s, marginTop: 3 * s, letterSpacing: "0.14em", textTransform: "uppercase", opacity: 0.7 }}>{role}</div>
+        <div style={{ width: 24 * s, height: 2 * s, background: inkColor, margin: (10 * s) + "px 0" }} />
+        <div style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 20 * s, lineHeight: 1.2, overflowWrap: "anywhere" }}>{name}</div>
+        <div style={{ fontSize: 12 * s, marginTop: 8 * s, lineHeight: 1.5, overflowWrap: "anywhere" }}>{role}</div>
       </div>
       <div className="absolute overflow-hidden" style={{ left: 0, right: 0, bottom: 0, height: "44%", background: strapColor, borderTopLeftRadius: 40 * s, color: cardColor }}>
         <Ornament className="absolute" style={{ width: 230 * s, left: -20 * s, top: -40 * s, opacity: 0.85, maxWidth: "none" }} />
@@ -665,7 +671,7 @@ export default function LanyardBadge({
         ref={cardRef}
         role="button"
         tabIndex={0}
-        aria-label="Badge. Drag to swing, press to flip."
+        aria-label={`${name}. ${role}. Badge: drag to swing, press to flip.`}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault()
